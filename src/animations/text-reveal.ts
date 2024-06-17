@@ -44,31 +44,36 @@ for (let i = 0; i < charRevealElements.length; i++) {
     targetElements = updatedTargetElements;
   }
 
-  let tweenProps: GsapTweenVars = {
+  const tweenProps: GsapTweenVars = {
     delay,
     stagger: staggerDelay,
     ease: easing,
     duration,
-    scrollTrigger: {
-      trigger: charRevealParentEl || charRevealEl,
-      start: 'top center',
-    },
   };
 
   if (animationType === 'from-bottom') {
-    tweenProps = { ...tweenProps, yPercent: 100 };
+    gsap.set(targetElements, { yPercent: 100 });
   }
   if (animationType === 'from-top') {
-    tweenProps = { ...tweenProps, yPercent: 100 };
+    gsap.set(targetElements, { yPercent: 100 });
   }
   if (animationType === 'fade-from-bottom-left') {
-    tweenProps = { ...tweenProps, y: fromY || '30%', x: fromX || '-50px', opacity: 0.05 };
+    gsap.set(targetElements, { y: fromY || '30%', x: fromX || '-50px', opacity: 0.05 });
   }
 
-  gsap.from(targetElements, tweenProps);
-}
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          gsap.to(targetElements, { ...tweenProps, y: 0, yPercent: 0, x: 0, opacity: 1 });
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.5,
+    }
+  );
 
-// const charRevealParentEl = assert(
-//   charRevealEl.closest(selectors.revealParent),
-//   `${selectors.revealParent} not found!`
-// ) as HTMLElement;
+  observer.observe(charRevealParentEl || charRevealEl);
+}

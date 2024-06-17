@@ -1,0 +1,18 @@
+/* For Text Animations */
+
+[data-reveal-type] {
+  font-kerning: none;
+}
+
+.line {
+  overflow: hidden;
+}
+
+.line-parent {
+  overflow: hidden;
+}
+
+[data-remove-mask] .line,
+[data-remove-mask] .line-parent {
+  overflow: visible;
+}
