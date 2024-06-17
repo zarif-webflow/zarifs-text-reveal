@@ -5,21 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
     <script src="http://localhost:3000/index.js" defer></script>
+    <!-- <script src="./index.js" defer></script> -->
     <title>Document</title>
   </head>
   <body>
     <div class="container">
       <div class="char-animation-wrapper" data-reveal-parent>
-        <h1 class="char-animation" data-reveal-type="char">
+        <h1
+          class="char-animation"
+          data-reveal-type="chars"
+          data-animation-type="from-bottom"
+          data-stagger-delay="0.03"
+          data-duration="0.7"
+        >
           <span class="highlighted">THE FREELANCE</span>
           <span>INDUSTRY REPO</span>
         </h1>
         <div class="word-animation-wrapper">
-          <p class="word-animation" data-reveal-type="word">
+          <p
+            class="word-animation"
+            data-reveal-type="words"
+            data-animation-type="from-bottom"
+            data-delay="1.2"
+            data-duration="0.3"
+          >
             Welcome to The Freelance Industry Report, where we gather insights on how independents
             are redefining the future of work.
           </p>
         </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="char-animation-wrapper">
+        <h1
+          class="char-animation"
+          data-reveal-type="chars"
+          data-animation-type="from-bottom"
+          data-stagger-delay="0.03"
+          data-duration="0.7"
+        >
+          <span class="highlighted">THE FREELANCE</span>
+          <span>INDUSTRY REPO</span>
+        </h1>
+        <div class="word-animation-wrapper">
+          <p
+            class="word-animation"
+            data-reveal-type="words"
+            data-animation-type="from-bottom"
+            data-delay="1.2"
+            data-duration="0.3"
+          >
+            Welcome to The Freelance Industry Report, where we gather insights on how independents
+            are redefining the future of work.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="char-animation-wrapper" data-remove-mask="true">
+        <h1
+          class="char-animation"
+          data-reveal-type="words"
+          data-animation-type="fade-from-bottom-left"
+          data-stagger-delay="0.1"
+          data-duration="0.8"
+          data-easing="power3.inOut"
+        >
+          <span class="highlighted">THE FREELANCE</span>
+          <span>INDUSTRY REPO</span>
+        </h1>
+        <!-- <div class="word-animation-wrapper">
+          <p
+            class="word-animation"
+            data-reveal-type="lines"
+            data-animation-type="fade-from-bottom-left"
+            data-delay="1.2"
+            data-duration="1"
+          >
+            Welcome to The Freelance Industry Report, where we gather insights on how independents
+            are redefining the future of work.
+          </p>
+        </div> -->
       </div>
     </div>
   </body>
