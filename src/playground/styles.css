@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  width: min(1280px, 100% - 4rem);
+  width: min(1920px, 100% - 8rem);
   padding-block: 4rem;
   margin-inline: auto;
 }
@@ -44,6 +44,10 @@ h1 .highlighted {
   margin-top: 1rem;
 }
 
+.container {
+  min-height: 100dvh;
+}
+
 /* Also for webflow */
 
 [data-reveal-type] {
@@ -52,4 +56,13 @@ h1 .highlighted {
 
 .line {
   overflow: hidden;
+}
+
+.line-parent {
+  overflow: hidden;
+}
+
+[data-remove-mask] .line,
+[data-remove-mask] .line-parent {
+  overflow: visible;
 }

@@ -1,1 +1,1 @@
-import '@/animations/character-reveal';
+import '@/animations/text-reveal';

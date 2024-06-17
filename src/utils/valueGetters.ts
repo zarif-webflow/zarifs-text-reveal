@@ -4,15 +4,17 @@ import {
   type AnimationDataProps,
   type AnimationTypeValue,
   animationTypeValuesSet,
+  gsapEaseSet,
+  type GsapEaseType,
   type RevealTypeValue,
   revealTypeValuesSet,
 } from './constants';
 
 export const getAnimationValues = (
   element: HTMLElement,
-  defaultValues: AnimationDataProps
+  defaultValues?: AnimationDataProps
 ): AnimationDataProps => {
-  const { animationType, delay, duration, easing, revealType, staggerDelay } =
+  const { animationType, delay, duration, easing, revealType, staggerDelay, fromX, fromY } =
     element.dataset as Record<AnimationDataKeys, string | undefined>;
 
   const selectedAnimationType = assert(
@@ -23,16 +25,24 @@ export const getAnimationValues = (
 
   const selectedRevealType = fallback(
     revealType,
-    defaultValues.revealType ?? 'chars',
+    defaultValues?.revealType ?? 'chars',
     (value) => value !== undefined && revealTypeValuesSet.has(value)
   ) as RevealTypeValue;
 
-  const selectedDelay = fallback(Number.parseInt(delay || ''), defaultValues.delay ?? 0);
-  const selectedDuration = fallback(Number.parseInt(duration || ''), defaultValues.duration ?? 500);
-  const selectedEasing = fallback(easing, defaultValues.easing ?? 'ease-in');
+  const selectedEasing = fallback(
+    easing,
+    defaultValues?.easing ?? 'powe3.out',
+    (value) => value !== undefined && gsapEaseSet.has(value)
+  ) as GsapEaseType;
+
+  const selectedDelay = fallback(Number.parseFloat(delay || ''), defaultValues?.delay ?? 0);
+  const selectedDuration = fallback(
+    Number.parseFloat(duration || ''),
+    defaultValues?.duration ?? 0.5
+  );
   const selectedStaggerDelay = fallback(
-    Number.parseInt(staggerDelay || ''),
-    defaultValues.staggerDelay ?? 50
+    Number.parseFloat(staggerDelay || ''),
+    defaultValues?.staggerDelay ?? 0.05
   );
 
   return {
@@ -42,5 +52,7 @@ export const getAnimationValues = (
     duration: selectedDuration,
     easing: selectedEasing,
     staggerDelay: selectedStaggerDelay,
+    fromX,
+    fromY,
   };
 };
