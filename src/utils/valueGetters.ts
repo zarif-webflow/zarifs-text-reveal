@@ -14,8 +14,17 @@ export const getAnimationValues = (
   element: HTMLElement,
   defaultValues?: AnimationDataProps
 ): AnimationDataProps => {
-  const { animationType, delay, duration, easing, revealType, staggerDelay, fromX, fromY } =
-    element.dataset as Record<AnimationDataKeys, string | undefined>;
+  const {
+    animationType,
+    delay,
+    duration,
+    easing,
+    revealType,
+    staggerDelay,
+    fromX,
+    fromY,
+    viewThreshold,
+  } = element.dataset as Record<AnimationDataKeys, string | undefined>;
 
   const selectedAnimationType = assert(
     animationType,
@@ -36,6 +45,10 @@ export const getAnimationValues = (
   ) as GsapEaseType;
 
   const selectedDelay = fallback(Number.parseFloat(delay || ''), defaultValues?.delay ?? 0);
+  const selectedViewThreshold = fallback(
+    Number.parseFloat(viewThreshold || ''),
+    defaultValues?.viewThreshold ?? 0.8
+  );
   const selectedDuration = fallback(
     Number.parseFloat(duration || ''),
     defaultValues?.duration ?? 0.5
@@ -54,5 +67,6 @@ export const getAnimationValues = (
     staggerDelay: selectedStaggerDelay,
     fromX,
     fromY,
+    viewThreshold: selectedViewThreshold,
   };
 };

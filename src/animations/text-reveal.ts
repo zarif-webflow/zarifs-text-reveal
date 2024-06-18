@@ -16,8 +16,17 @@ for (let i = 0; i < charRevealElements.length; i++) {
 
   const charRevealParentEl = charRevealEl.closest(selectors.revealParent) as HTMLElement | null;
 
-  const { animationType, delay, duration, easing, revealType, staggerDelay, fromX, fromY } =
-    getAnimationValues(charRevealEl);
+  const {
+    animationType,
+    delay,
+    duration,
+    easing,
+    revealType,
+    staggerDelay,
+    fromX,
+    fromY,
+    viewThreshold,
+  } = getAnimationValues(charRevealEl);
 
   const splitText = SplitType.create(charRevealEl);
 
@@ -71,7 +80,7 @@ for (let i = 0; i < charRevealElements.length; i++) {
       });
     },
     {
-      threshold: 0.5,
+      threshold: viewThreshold,
     }
   );
 
