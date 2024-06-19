@@ -29,7 +29,7 @@ for (let i = 0; i < charRevealElements.length; i++) {
     viewThreshold,
   } = getAnimationValues(charRevealEl);
 
-  const splitText = SplitType.create(charRevealEl);
+  const splitText = SplitType.create(charRevealEl, { types: 'words,chars' });
 
   const initialWordElements = splitText.words || [];
   const wordElements: HTMLElement[] = [];
@@ -47,14 +47,10 @@ for (let i = 0; i < charRevealElements.length; i++) {
   }
 
   const charElements = [...charRevealEl.querySelectorAll('.char')] as HTMLElement[];
-  const lineElements = [...charRevealEl.querySelectorAll('.line')] as HTMLElement[];
+  // const lineElements = [...charRevealEl.querySelectorAll('.line')] as HTMLElement[];
 
   const targetElements =
-    (revealType === 'lines'
-      ? lineElements
-      : revealType === 'words'
-        ? wordElements
-        : charElements) || [];
+    (revealType === 'lines' || revealType === 'words' ? wordElements : charElements) || [];
 
   const tweenProps: GsapTweenVars = {
     delay,
@@ -67,7 +63,7 @@ for (let i = 0; i < charRevealElements.length; i++) {
     gsap.set(targetElements, { yPercent: 100 });
   }
   if (animationType === 'from-top') {
-    gsap.set(targetElements, { yPercent: 100 });
+    gsap.set(targetElements, { yPercent: -100 });
   }
   if (animationType === 'fade-from-bottom-left') {
     gsap.set(targetElements, {
@@ -77,11 +73,53 @@ for (let i = 0; i < charRevealElements.length; i++) {
     });
   }
 
+  let allLines: HTMLElement[][] = [];
+  if (revealType === 'lines') {
+    let currentLineTopRect = 0;
+    let currentLineWords: HTMLElement[] = [];
+    const resOb = new ResizeObserver((entries) => {
+      for (let entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+        for (let k = 0; k < wordElements.length; k++) {
+          const wordElement = wordElements[k];
+          const wordTopRect = wordElement.getBoundingClientRect().top;
+
+          if (wordTopRect === currentLineTopRect) {
+            currentLineWords.push(wordElement);
+          } else {
+            currentLineTopRect = wordTopRect;
+            currentLineWords.length > 0 && allLines.push(currentLineWords);
+            currentLineWords = [wordElement];
+          }
+        }
+        allLines.push(currentLineWords);
+      }
+    });
+
+    resOb.observe(charRevealEl);
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          gsap.to(targetElements, { ...tweenProps, y: 0, yPercent: 0, x: 0, opacity: 1 });
+          if (revealType === 'lines' && allLines.length > 0) {
+            for (let i = 0; i < allLines.length; i++) {
+              const line = allLines[i];
+              for (let j = 0; j < line.length; j++) {
+                const word = line[j];
+                gsap.to(word, {
+                  ...tweenProps,
+                  y: 0,
+                  yPercent: 0,
+                  x: 0,
+                  opacity: 1,
+                  stagger: j === 0 ? tweenProps.stagger : 0,
+                });
+              }
+            }
+          } else {
+            gsap.to(targetElements, { ...tweenProps, y: 0, yPercent: 0, x: 0, opacity: 1 });
+          }
           observer.unobserve(entry.target);
         }
       });
