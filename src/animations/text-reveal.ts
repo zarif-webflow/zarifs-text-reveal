@@ -106,6 +106,11 @@ for (let i = 0; i < charRevealElements.length; i++) {
             for (let i = 0; i < allLines.length; i++) {
               const line = allLines[i];
               for (let j = 0; j < line.length; j++) {
+                const delayPropValue = (tweenProps.delay as number) || 0;
+                const staggerPropValue = (tweenProps.stagger as number) || 0;
+
+                const delay = delayPropValue + i * staggerPropValue;
+
                 const word = line[j];
                 gsap.to(word, {
                   ...tweenProps,
@@ -113,7 +118,8 @@ for (let i = 0; i < charRevealElements.length; i++) {
                   yPercent: 0,
                   x: 0,
                   opacity: 1,
-                  stagger: j === 0 ? tweenProps.stagger : 0,
+                  delay,
+                  stagger: 0,
                 });
               }
             }
