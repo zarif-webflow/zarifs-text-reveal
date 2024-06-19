@@ -25,33 +25,36 @@ for (let i = 0; i < charRevealElements.length; i++) {
     staggerDelay,
     fromX,
     fromY,
+    fromOpacity,
     viewThreshold,
   } = getAnimationValues(charRevealEl);
 
   const splitText = SplitType.create(charRevealEl);
 
-  let targetElements =
-    (revealType === 'lines'
-      ? splitText.lines
-      : revealType === 'words'
-        ? splitText.words
-        : splitText.chars) || [];
+  const initialWordElements = splitText.words || [];
+  const wordElements: HTMLElement[] = [];
 
-  if (revealType === 'lines') {
-    const updatedTargetElements: HTMLElement[] = [];
-    for (let j = 0; j < targetElements.length; j++) {
-      const el = targetElements[j];
+  for (let j = 0; j < initialWordElements.length; j++) {
+    const el = initialWordElements[j];
 
-      const parentEl = document.createElement('div');
-      const cloneEl = el.cloneNode(true) as HTMLElement;
+    const parentEl = document.createElement('span');
+    const cloneEl = el.cloneNode(true) as HTMLElement;
 
-      parentEl.classList.add('line-parent');
-      parentEl.appendChild(cloneEl);
-      el.replaceWith(parentEl);
-      updatedTargetElements.push(cloneEl);
-    }
-    targetElements = updatedTargetElements;
+    parentEl.classList.add('reveal-parent');
+    parentEl.appendChild(cloneEl);
+    el.replaceWith(parentEl);
+    wordElements.push(cloneEl);
   }
+
+  const charElements = [...charRevealEl.querySelectorAll('.char')] as HTMLElement[];
+  const lineElements = [...charRevealEl.querySelectorAll('.line')] as HTMLElement[];
+
+  const targetElements =
+    (revealType === 'lines'
+      ? lineElements
+      : revealType === 'words'
+        ? wordElements
+        : charElements) || [];
 
   const tweenProps: GsapTweenVars = {
     delay,
@@ -67,7 +70,11 @@ for (let i = 0; i < charRevealElements.length; i++) {
     gsap.set(targetElements, { yPercent: 100 });
   }
   if (animationType === 'fade-from-bottom-left') {
-    gsap.set(targetElements, { y: fromY || '30%', x: fromX || '-50px', opacity: 0.05 });
+    gsap.set(targetElements, {
+      y: fromY || '30%',
+      x: fromX || '-50px',
+      opacity: fromOpacity || '0.05',
+    });
   }
 
   const observer = new IntersectionObserver(

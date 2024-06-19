@@ -47,22 +47,3 @@ h1 .highlighted {
 .container {
   min-height: 100dvh;
 }
-
-/* Also for webflow */
-
-[data-reveal-type] {
-  font-kerning: none;
-}
-
-.line {
-  overflow: hidden;
-}
-
-.line-parent {
-  overflow: hidden;
-}
-
-[data-remove-mask] .line,
-[data-remove-mask] .line-parent {
-  overflow: visible;
-}

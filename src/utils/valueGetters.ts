@@ -23,6 +23,7 @@ export const getAnimationValues = (
     staggerDelay,
     fromX,
     fromY,
+    fromOpacity,
     viewThreshold,
   } = element.dataset as Record<AnimationDataKeys, string | undefined>;
 
@@ -67,6 +68,7 @@ export const getAnimationValues = (
     staggerDelay: selectedStaggerDelay,
     fromX,
     fromY,
+    fromOpacity,
     viewThreshold: selectedViewThreshold,
   };
 };

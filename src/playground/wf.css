@@ -4,15 +4,12 @@
   font-kerning: none;
 }
 
-.line {
+.reveal-parent {
+  display: inline-flex;
   overflow: hidden;
+  word-break: keep-all;
 }
 
-.line-parent {
-  overflow: hidden;
-}
-
-[data-remove-mask] .line,
-[data-remove-mask] .line-parent {
+[data-remove-mask] .reveal-parent {
   overflow: visible;
 }

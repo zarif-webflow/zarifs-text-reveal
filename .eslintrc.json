@@ -1,1 +1,1 @@
-{ "extends": ["@finsweet"] }
+{ "extends": ["@finsweet"], "rules": { "prefer-destructuring": "off" } }

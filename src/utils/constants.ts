@@ -25,6 +25,7 @@ export type AnimationDataProps = {
   staggerDelay: number;
   fromX: string | undefined;
   fromY: string | undefined;
+  fromOpacity: string | undefined;
   viewThreshold: number;
 };
 
