@@ -1,6 +1,8 @@
 export const selectors = {
   revealType: '[data-reveal-type]',
   revealParent: '[data-reveal-parent]',
+  toggleScroll: '[data-toggle-scroll]',
+  resetAnimation: '[data-reset-animation]',
 } as const;
 
 const revealTypeValuesArray = ['chars', 'words', 'lines'] as const;
@@ -27,6 +29,7 @@ export type AnimationDataProps = {
   fromY: string | undefined;
   fromOpacity: string | undefined;
   viewThreshold: number;
+  resetAnimation: string | undefined;
 };
 
 export type AnimationDataKeys = keyof AnimationDataProps;

@@ -15,6 +15,7 @@ for (let i = 0; i < charRevealElements.length; i++) {
   ) as HTMLElement;
 
   const charRevealParentEl = charRevealEl.closest(selectors.revealParent) as HTMLElement | null;
+  const resetAnimationParent = charRevealEl.closest(selectors.resetAnimation) as HTMLElement | null;
 
   const {
     animationType,
@@ -59,19 +60,24 @@ for (let i = 0; i < charRevealElements.length; i++) {
     duration,
   };
 
-  if (animationType === 'from-bottom') {
-    gsap.set(targetElements, { yPercent: 100 });
-  }
-  if (animationType === 'from-top') {
-    gsap.set(targetElements, { yPercent: -100 });
-  }
-  if (animationType === 'fade-from-bottom-left') {
-    gsap.set(targetElements, {
-      y: fromY || '30%',
-      x: fromX || '-50px',
-      opacity: fromOpacity || '0.05',
-    });
-  }
+  const initAnimations = (transition: boolean = false) => {
+    if (animationType === 'from-bottom') {
+      gsap.to(targetElements, { yPercent: 100, duration: transition ? duration : 0 });
+    }
+    if (animationType === 'from-top') {
+      gsap.to(targetElements, { yPercent: -100, duration: transition ? duration : 0 });
+    }
+    if (animationType === 'fade-from-bottom-left') {
+      gsap.to(targetElements, {
+        y: fromY || '30%',
+        x: fromX || '-50px',
+        opacity: fromOpacity || '0.05',
+        duration: transition ? duration : 0,
+      });
+    }
+  };
+
+  initAnimations();
 
   let allLines: HTMLElement[][] = [];
   if (revealType === 'lines') {
@@ -97,6 +103,9 @@ for (let i = 0; i < charRevealElements.length; i++) {
 
     resOb.observe(charRevealEl);
   }
+
+  // const shouldAnimationReset = resetAnimation !== undefined;
+  const shouldAnimationReset = resetAnimationParent !== null;
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -126,7 +135,15 @@ for (let i = 0; i < charRevealElements.length; i++) {
           } else {
             gsap.to(targetElements, { ...tweenProps, y: 0, yPercent: 0, x: 0, opacity: 1 });
           }
-          observer.unobserve(entry.target);
+          // console.log(resetAnimationParent, 'RECENT ANIMATION PARENT');
+          if (!shouldAnimationReset) {
+            // console.log('unobserved');
+            // observer.unobserve(entry.target);
+          }
+        } else {
+          if (shouldAnimationReset) {
+            initAnimations(true);
+          }
         }
       });
     },

@@ -6,10 +6,33 @@
 
 .reveal-parent {
   display: inline-flex;
-  overflow: hidden;
+  overflow-y: clip;
   word-break: keep-all;
 }
 
 [data-remove-mask] .reveal-parent {
-  overflow: visible;
+  overflow-y: visible;
+}
+
+/* For Lenis Smooth Scroll */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }

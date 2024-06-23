@@ -25,6 +25,7 @@ export const getAnimationValues = (
     fromY,
     fromOpacity,
     viewThreshold,
+    resetAnimation,
   } = element.dataset as Record<AnimationDataKeys, string | undefined>;
 
   const selectedAnimationType = assert(
@@ -70,5 +71,6 @@ export const getAnimationValues = (
     fromY,
     fromOpacity,
     viewThreshold: selectedViewThreshold,
+    resetAnimation,
   };
 };
