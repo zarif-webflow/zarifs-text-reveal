@@ -47,3 +47,12 @@ h1 .highlighted {
 .container {
   min-height: 100dvh;
 }
+
+.loader {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: darkblue;
+  color: white;
+  z-index: 99999;
+}

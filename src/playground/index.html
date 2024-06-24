@@ -9,12 +9,13 @@
     <script src="../../dist/index.js" defer></script>
     <title>Document</title>
   </head>
-  <body>
+  <body data-loader-duration="1000">
+    <div class="loader">Loading</div>
     <div class="container">
       <div>
         <button data-toggle-scroll="">Toggle Scroll</button>
       </div>
-      <div class="char-animation-wrapper" data-reveal-parent>
+      <div data-reset-animation class="char-animation-wrapper" data-reveal-parent>
         <h1
           class="char-animation"
           data-reveal-type="chars"
