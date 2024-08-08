@@ -9,7 +9,7 @@ import { getAnimationValues } from '@/utils/valueGetters';
 const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
 const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '');
 
-(() => {
+(async () => {
   for (let i = 0; i < charRevealElements.length; i++) {
     const charRevealEl = assert(charRevealElements[i], `${selectors.revealType} not found!`);
 
@@ -116,13 +116,10 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
 
     const targetObserverElement = charRevealParentEl || charRevealEl;
 
-    let didAnimationRun = false;
-
     const revealObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            didAnimationRun = true;
             if (revealType === 'lines' && allLines.length > 0) {
               for (let i = 0; i < allLines.length; i++) {
                 const line = allLines[i];
@@ -133,6 +130,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
                   const delay = delayPropValue + i * staggerPropValue;
 
                   const word = line[j];
+
                   gsap.to(word, {
                     ...tweenProps,
                     y: 0,
@@ -141,7 +139,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
                     opacity: 1,
                     delay,
                     stagger: 0,
-                    overwrite: false,
+                    overwrite: 'auto',
                   });
                 }
               }
@@ -152,7 +150,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
                 yPercent: 0,
                 x: 0,
                 opacity: 1,
-                overwrite: false,
+                overwrite: 'auto',
               });
             }
 
@@ -173,8 +171,9 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       resetObserver = new IntersectionObserver(
         (entries) => {
           // eslint-disable-next-line
-          for (const _ of entries) {
-            didAnimationRun && gsap.to(targetElements, getAnimationProps(false, true));
+          for (const entry of entries) {
+            if (entry.isIntersecting) return;
+            gsap.to(targetElements, getAnimationProps(false, true));
           }
         },
         { threshold: 0 }
