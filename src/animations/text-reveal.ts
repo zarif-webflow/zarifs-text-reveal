@@ -6,20 +6,15 @@ import { gsap } from '@/utils/gsap';
 import type { GsapTweenVars } from '@/utils/types';
 import { getAnimationValues } from '@/utils/valueGetters';
 
-const charRevealElements = document.querySelectorAll(selectors.revealType);
+const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
 const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '');
 
 (() => {
   for (let i = 0; i < charRevealElements.length; i++) {
-    const charRevealEl = assert(
-      charRevealElements[i],
-      `${selectors.revealType} not found!`
-    ) as HTMLElement;
+    const charRevealEl = assert(charRevealElements[i], `${selectors.revealType} not found!`);
 
-    const charRevealParentEl = charRevealEl.closest(selectors.revealParent) as HTMLElement | null;
-    const resetAnimationParent = charRevealEl.closest(
-      selectors.resetAnimation
-    ) as HTMLElement | null;
+    const charRevealParentEl = charRevealEl.closest<HTMLElement>(selectors.revealParent);
+    const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
 
     const {
       animationType,
@@ -51,7 +46,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       wordElements.push(cloneEl);
     }
 
-    const charElements = [...charRevealEl.querySelectorAll('.char')] as HTMLElement[];
+    const charElements = [...charRevealEl.querySelectorAll<HTMLElement>('.char')];
 
     const targetElements =
       (revealType === 'lines' || revealType === 'words' ? wordElements : charElements) || [];
@@ -63,26 +58,36 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       duration,
     };
 
-    const initAnimations = (transition: boolean = false) => {
+    const getAnimationProps = (
+      transition: boolean = false,
+      overwrite?: boolean | 'auto' | undefined
+    ) => {
+      let animationsProps: GsapTweenVars = { overwrite };
+
       if (animationType === 'from-bottom') {
-        gsap.to(targetElements, { yPercent: 100, duration: transition ? duration : 0 });
+        animationsProps.yPercent = 100;
+        animationsProps.duration = transition ? duration : 0;
       }
+
       if (animationType === 'from-top') {
-        gsap.to(targetElements, { yPercent: -100, duration: transition ? duration : 0 });
+        animationsProps.yPercent = -100;
+        animationsProps.duration = transition ? duration : 0;
       }
+
       if (animationType === 'fade-from-bottom-left') {
-        gsap.to(targetElements, {
-          y: fromY || '30%',
-          x: fromX || '-50px',
-          opacity: fromOpacity || '0.05',
-          duration: transition ? duration : 0,
-        });
+        animationsProps.y = fromY || '30%';
+        animationsProps.x = fromX || '-50px';
+        animationsProps.opacity = fromOpacity || '0.05';
+        animationsProps.duration = transition ? duration : 0;
       }
+
+      return animationsProps;
     };
 
-    initAnimations();
+    gsap.to(targetElements, getAnimationProps(false, 'auto'));
 
     let allLines: HTMLElement[][] = [];
+
     if (revealType === 'lines') {
       let currentLineTopRect = 0;
       let currentLineWords: HTMLElement[] = [];
@@ -109,10 +114,15 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
 
     const shouldAnimationReset = resetAnimationParent !== null;
 
-    const observer = new IntersectionObserver(
+    const targetObserverElement = charRevealParentEl || charRevealEl;
+
+    let didAnimationRun = false;
+
+    const revealObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           if (entry.isIntersecting) {
+            didAnimationRun = true;
             if (revealType === 'lines' && allLines.length > 0) {
               for (let i = 0; i < allLines.length; i++) {
                 const line = allLines[i];
@@ -131,34 +141,55 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
                     opacity: 1,
                     delay,
                     stagger: 0,
+                    overwrite: false,
                   });
                 }
               }
             } else {
-              gsap.to(targetElements, { ...tweenProps, y: 0, yPercent: 0, x: 0, opacity: 1 });
+              gsap.to(targetElements, {
+                ...tweenProps,
+                y: 0,
+                yPercent: 0,
+                x: 0,
+                opacity: 1,
+                overwrite: false,
+              });
             }
+
             if (!shouldAnimationReset) {
-              observer.unobserve(entry.target);
-            }
-          } else {
-            if (shouldAnimationReset) {
-              initAnimations(true);
+              revealObserver.unobserve(entry.target);
             }
           }
-        });
+        }
       },
       {
         threshold: viewThreshold,
       }
     );
 
+    let resetObserver: IntersectionObserver | undefined = undefined;
+
+    if (shouldAnimationReset) {
+      resetObserver = new IntersectionObserver(
+        (entries) => {
+          // eslint-disable-next-line
+          for (const _ of entries) {
+            didAnimationRun && gsap.to(targetElements, getAnimationProps(false, true));
+          }
+        },
+        { threshold: 0 }
+      );
+    }
+
     window.addEventListener('load', () => {
       if (!Number.isNaN(loaderDuration)) {
         setTimeout(() => {
-          observer.observe(charRevealParentEl || charRevealEl);
+          revealObserver.observe(targetObserverElement);
+          resetObserver?.observe(targetObserverElement);
         }, loaderDuration);
       } else {
-        observer.observe(charRevealParentEl || charRevealEl);
+        revealObserver.observe(targetObserverElement);
+        resetObserver?.observe(targetObserverElement);
       }
     });
   }
