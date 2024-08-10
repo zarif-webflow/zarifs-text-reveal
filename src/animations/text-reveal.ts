@@ -180,16 +180,16 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       );
     }
 
-    window.addEventListener('load', () => {
-      if (!Number.isNaN(loaderDuration)) {
+    if (!Number.isNaN(loaderDuration)) {
+      window.addEventListener('load', () => {
         setTimeout(() => {
           revealObserver.observe(targetObserverElement);
           resetObserver?.observe(targetObserverElement);
         }, loaderDuration);
-      } else {
-        revealObserver.observe(targetObserverElement);
-        resetObserver?.observe(targetObserverElement);
-      }
-    });
+      });
+    } else {
+      revealObserver.observe(targetObserverElement);
+      resetObserver?.observe(targetObserverElement);
+    }
   }
 })();
