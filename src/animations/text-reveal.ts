@@ -83,10 +83,10 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       return animationsProps;
     };
 
+    gsap.to(targetElements, getAnimationProps(false, 'auto'));
+
     /* Remove initial invisibility */
     charRevealEl.dataset.initialized = '';
-
-    gsap.to(targetElements, getAnimationProps(false, 'auto'));
 
     let allLines: HTMLElement[][] = [];
 
