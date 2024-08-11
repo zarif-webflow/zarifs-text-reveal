@@ -1,6 +1,5 @@
 import SplitType from 'split-type';
 
-import { assert } from '@/utils/common';
 import { selectors } from '@/utils/constants';
 import { gsap } from '@/utils/gsap';
 import type { GsapTweenVars } from '@/utils/types';
@@ -11,7 +10,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
 
 (async () => {
   for (let i = 0; i < charRevealElements.length; i++) {
-    const charRevealEl = assert(charRevealElements[i], `${selectors.revealType} not found!`);
+    const charRevealEl = charRevealElements[i]!;
 
     const charRevealParentEl = charRevealEl.closest<HTMLElement>(selectors.revealParent);
     const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
@@ -83,6 +82,9 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
 
       return animationsProps;
     };
+
+    /* Remove initial invisibility */
+    charRevealEl.dataset.initialized = '';
 
     gsap.to(targetElements, getAnimationProps(false, 'auto'));
 
