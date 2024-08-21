@@ -16,6 +16,8 @@ function raf(time: number) {
 requestAnimationFrame(raf);
 
 const scrollTogglers = [...document.querySelectorAll(selectors.toggleScroll)] as HTMLElement[];
+const scrollStartTriggers = [...document.querySelectorAll(selectors.startScroll)] as HTMLElement[];
+const scrollStopTriggers = [...document.querySelectorAll(selectors.stopScroll)] as HTMLElement[];
 
 for (let i = 0; i < scrollTogglers.length; i++) {
   const scrollToggleElement = scrollTogglers[i];
@@ -28,5 +30,19 @@ for (let i = 0; i < scrollTogglers.length; i++) {
     }
     lenis.stop();
     scrollToggleElement.classList.add('stop-scroll');
+  });
+}
+
+for (const startTrigger of scrollStartTriggers) {
+  startTrigger.addEventListener('click', () => {
+    if (!lenis.isStopped) return;
+    lenis.start();
+  });
+}
+
+for (const stopTrigger of scrollStopTriggers) {
+  stopTrigger.addEventListener('click', () => {
+    if (lenis.isStopped) return;
+    lenis.stop();
   });
 }

@@ -2,6 +2,8 @@ export const selectors = {
   revealType: '[data-reveal-type]',
   revealParent: '[data-reveal-parent]',
   toggleScroll: '[data-toggle-scroll]',
+  startScroll: '[data-start-scroll]',
+  stopScroll: '[data-stop-scroll]',
   resetAnimation: '[data-reset-animation]',
 } as const;
 
