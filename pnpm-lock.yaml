@@ -14,6 +14,9 @@ importers:
       '@types/animejs':
         specifier: ^3.1.12
         version: 3.1.12
+      '@zag-js/remove-scroll':
+        specifier: ^0.65.1
+        version: 0.65.1
       animejs:
         specifier: ^3.2.2
         version: 3.2.2
@@ -442,6 +445,12 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+
+  '@zag-js/dom-query@0.65.1':
+    resolution: {integrity: sha512-pJqIo3Zu0fiS0TcfQ/nYcHRDlSCoi9L7qSHUjUGh6A3eI71dfS09a+iFX6sVcoP8Y9InqrQdl9NnuKMqyRlP1g==}
+
+  '@zag-js/remove-scroll@0.65.1':
+    resolution: {integrity: sha512-Ajdd5Ffl+S0/ZwPGdGqGvRAVeakBzTeymXO5EIgxn6vk5KEmSg8x1xdRjJguXibZbg7Bqt54dMbJWWuDdRtc/w==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2097,6 +2106,12 @@ snapshots:
       eslint-visitor-keys: 3.4.3
 
   '@ungap/structured-clone@1.2.0': {}
+
+  '@zag-js/dom-query@0.65.1': {}
+
+  '@zag-js/remove-scroll@0.65.1':
+    dependencies:
+      '@zag-js/dom-query': 0.65.1
 
   acorn-jsx@5.3.2(acorn@8.11.3):
     dependencies:

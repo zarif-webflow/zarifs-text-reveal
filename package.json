@@ -43,6 +43,7 @@
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
     "@types/animejs": "^3.1.12",
+    "@zag-js/remove-scroll": "^0.65.1",
     "animejs": "^3.2.2",
     "gsap": "^3.12.5",
     "lenis": "^1.1.3",

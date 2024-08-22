@@ -1,3 +1,4 @@
+import { preventBodyScroll } from '@zag-js/remove-scroll';
 import Lenis from 'lenis';
 
 import { selectors } from '@/utils/constants';
@@ -19,15 +20,19 @@ const scrollTogglers = [...document.querySelectorAll(selectors.toggleScroll)] as
 const scrollStartTriggers = [...document.querySelectorAll(selectors.startScroll)] as HTMLElement[];
 const scrollStopTriggers = [...document.querySelectorAll(selectors.stopScroll)] as HTMLElement[];
 
+let resetScroll: (() => void) | undefined = undefined;
+
 for (let i = 0; i < scrollTogglers.length; i++) {
   const scrollToggleElement = scrollTogglers[i];
 
   scrollToggleElement.addEventListener('click', () => {
     if (scrollToggleElement.classList.contains('stop-scroll')) {
+      resetScroll?.();
       lenis.start();
       scrollToggleElement.classList.remove('stop-scroll');
       return;
     }
+    resetScroll = preventBodyScroll();
     lenis.stop();
     scrollToggleElement.classList.add('stop-scroll');
   });
@@ -35,14 +40,14 @@ for (let i = 0; i < scrollTogglers.length; i++) {
 
 for (const startTrigger of scrollStartTriggers) {
   startTrigger.addEventListener('click', () => {
-    if (!lenis.isStopped) return;
     lenis.start();
+    resetScroll?.();
   });
 }
 
 for (const stopTrigger of scrollStopTriggers) {
   stopTrigger.addEventListener('click', () => {
-    if (lenis.isStopped) return;
     lenis.stop();
+    resetScroll = preventBodyScroll();
   });
 }
