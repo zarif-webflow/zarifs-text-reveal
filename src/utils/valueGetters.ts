@@ -4,8 +4,8 @@ import {
   type AnimationDataProps,
   type AnimationTypeValue,
   animationTypeValuesSet,
-  gsapEaseSet,
-  type GsapEaseType,
+  motionEaseSet,
+  type MotionEaseType,
   type RevealTypeValue,
   revealTypeValuesSet,
 } from './constants';
@@ -42,9 +42,9 @@ export const getAnimationValues = (
 
   const selectedEasing = fallback(
     easing,
-    defaultValues?.easing ?? 'powe3.out',
-    (value) => value !== undefined && gsapEaseSet.has(value)
-  ) as GsapEaseType;
+    (defaultValues?.easing ?? 'ease') as string,
+    (value) => value !== undefined && motionEaseSet.has(value as MotionEaseType)
+  ) as MotionEaseType;
 
   const selectedDelay = fallback(Number.parseFloat(delay || ''), defaultValues?.delay ?? 0);
   const selectedViewThreshold = fallback(

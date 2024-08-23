@@ -1,3 +1,5 @@
+import { type Easing } from 'motion';
+
 export const selectors = {
   revealType: '[data-reveal-type]',
   revealParent: '[data-reveal-parent]',
@@ -24,7 +26,7 @@ export type AnimationDataProps = {
   revealType: RevealTypeValue;
   animationType: AnimationTypeValue;
   duration: number;
-  easing: string;
+  easing: MotionEaseType;
   delay: number;
   staggerDelay: number;
   fromX: string | undefined;
@@ -35,48 +37,14 @@ export type AnimationDataProps = {
 };
 
 export type AnimationDataKeys = keyof AnimationDataProps;
-
-const gsapEaseArray = [
-  'power1',
-  'power1.in',
-  'power1.out',
-  'power1.inOut',
-  'power2',
-  'power2.in',
-  'power2.out',
-  'power2.inOut',
-  'power3',
-  'power3.in',
-  'power3.out',
-  'power3.inOut',
-  'power4',
-  'power4.in',
-  'power4.out',
-  'power4.inOut',
-  'back',
-  'back.in',
-  'back.out',
-  'back.inOut',
-  'bounce',
-  'bounce.in',
-  'bounce.out',
-  'bounce.inOut',
-  'circ',
-  'circ.in',
-  'circ.out',
-  'circ.inOut',
-  'elastic',
-  'elastic.in',
-  'elastic.out',
-  'elastic.inOut',
-  'expo',
-  'expo.in',
-  'expo.out',
-  'expo.inOut',
-  'sine',
-  'sine.in',
-  'sine.out',
-  'sine.inOut',
-] as const;
-export const gsapEaseSet: Set<string> = new Set(gsapEaseArray);
-export type GsapEaseType = (typeof gsapEaseArray)[number];
+export const motionEaseArray: Easing[] = [
+  'ease',
+  'ease-in',
+  'ease-in-out',
+  'ease-out',
+  'linear',
+  'step-end',
+  'step-start',
+];
+export type MotionEaseType = (typeof motionEaseArray)[number];
+export const motionEaseSet: Set<MotionEaseType> = new Set(motionEaseArray);
