@@ -11,6 +11,7 @@ const ENTRY_POINTS = [
   'src/index.ts',
   'src/animations/text-reveal.ts',
   'src/animations/smooth-scroll.ts',
+  'src/animations/scroll-direction-nav.ts',
 ];
 
 // Config dev serving
