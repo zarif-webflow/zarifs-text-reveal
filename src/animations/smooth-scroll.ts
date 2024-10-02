@@ -3,11 +3,15 @@ import Lenis from 'lenis';
 
 import { selectors } from '@/utils/constants';
 
-const lenis = new Lenis({
-  lerp: 0.1,
-  wheelMultiplier: 0.7,
-  gestureOrientation: 'vertical',
-});
+const activateLenis = () => {
+  return new Lenis({
+    lerp: 0.1,
+    wheelMultiplier: 0.7,
+    gestureOrientation: 'vertical',
+  });
+};
+
+let lenis = activateLenis();
 
 function raf(time: number) {
   lenis.raf(time);
@@ -28,26 +32,26 @@ for (let i = 0; i < scrollTogglers.length; i++) {
   scrollToggleElement.addEventListener('click', () => {
     if (scrollToggleElement.classList.contains('stop-scroll')) {
       resetScroll?.();
-      lenis.start();
+      lenis = activateLenis();
       scrollToggleElement.classList.remove('stop-scroll');
       return;
     }
     resetScroll = preventBodyScroll();
-    lenis.stop();
+    lenis.destroy();
     scrollToggleElement.classList.add('stop-scroll');
   });
 }
 
 for (const startTrigger of scrollStartTriggers) {
   startTrigger.addEventListener('click', () => {
-    lenis.start();
+    lenis = activateLenis();
     resetScroll?.();
   });
 }
 
 for (const stopTrigger of scrollStopTriggers) {
   stopTrigger.addEventListener('click', () => {
-    lenis.stop();
+    lenis.destroy();
     resetScroll = preventBodyScroll();
   });
 }
