@@ -4,20 +4,22 @@ import Lenis from 'lenis';
 import { selectors } from '@/utils/constants';
 
 const init = () => {
-  if (document.body.dataset.noSmoothScroll !== undefined) return;
+  const noSmoothScroll = document.body.dataset.noSmoothScroll !== undefined;
 
   const activateLenis = () => {
-    return new Lenis({
-      lerp: 0.1,
-      wheelMultiplier: 0.7,
-      gestureOrientation: 'vertical',
-    });
+    return noSmoothScroll
+      ? null
+      : new Lenis({
+          lerp: 0.1,
+          wheelMultiplier: 0.7,
+          gestureOrientation: 'vertical',
+        });
   };
 
   let lenis = activateLenis();
 
   function raf(time: number) {
-    lenis.raf(time);
+    lenis?.raf(time);
     requestAnimationFrame(raf);
   }
 
@@ -42,7 +44,7 @@ const init = () => {
         return;
       }
       resetScroll = preventBodyScroll();
-      lenis.destroy();
+      lenis?.destroy();
       scrollToggleElement.classList.add('stop-scroll');
     });
   }
@@ -56,7 +58,7 @@ const init = () => {
 
   for (const stopTrigger of scrollStopTriggers) {
     stopTrigger.addEventListener('click', () => {
-      lenis.destroy();
+      lenis?.destroy();
       resetScroll = preventBodyScroll();
     });
   }

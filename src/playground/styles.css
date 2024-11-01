@@ -56,3 +56,43 @@ h1 .highlighted {
   color: white;
   z-index: 99999;
 }
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-101%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-101%);
+  }
+}
+
+[data-navbar] {
+  transform: translateY(0%);
+  opacity: 1;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease;
+}
+
+[data-navbar].hide-navbar {
+  transform: translateY(-101%);
+  opacity: 0;
+  animation: fadeOut 0.3s;
+}
+
+.w-richtext-figure-type-image {
+  display: block !important;
+  clear: none !important;
+  float: none !important;
+}
