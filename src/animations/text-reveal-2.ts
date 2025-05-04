@@ -1,3 +1,4 @@
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import SplitType from 'split-type';
 
@@ -13,8 +14,11 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
   for (let i = 0; i < charRevealElements.length; i++) {
     const charRevealEl = charRevealElements[i]!;
 
-    const charRevealParentEl = charRevealEl.closest<HTMLElement>(selectors.revealParent);
+    const charRevealParentEl =
+      charRevealEl.closest<HTMLElement>(selectors.revealParent) || charRevealEl;
     const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
+    console.log(resetAnimationParent, 'Reset Animation Parent');
+    const shouldAnimationRestart = resetAnimationParent !== null;
 
     const {
       animationType,
@@ -34,7 +38,24 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       autoSplit: true,
       mask: 'words',
       onSplit: (split) => {
-        return gsap.from(split.words, { yPercent: 100, stagger: 0.1 });
+        const tl = gsap.timeline();
+
+        tl.set(split.words, {
+          opacity: fromOpacity || '0.08',
+          x: fromX || '0%',
+          y: fromY || '100%',
+        }).add('start');
+
+        tl.to(split.words, { opacity: '1', x: '0%', y: '0%', stagger: 0.1 }).add('end');
+        tl.pause();
+
+        const scroll = ScrollTrigger.create({
+          trigger: charRevealParentEl,
+          onEnter: () => tl.restart(),
+          onEnterBack: shouldAnimationRestart ? () => tl.restart() : undefined,
+          onLeave: shouldAnimationRestart ? () => tl.progress(0.01) : undefined,
+          once: !shouldAnimationRestart,
+        });
       },
     });
   }
