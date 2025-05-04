@@ -37,10 +37,13 @@ type Timeline = gsap.core.Timeline;
     let scrollTrig: globalThis.ScrollTrigger | undefined = undefined;
 
     const split = SplitText.create(charRevealEl, {
-      type: 'words',
+      type: revealType === 'chars' ? 'words, chars' : revealType,
       autoSplit: true,
-      mask: 'words',
+      mask: revealType,
+      smartWrap: true,
       onSplit: (split) => {
+        const splittedElements = split[revealType];
+
         if (tl !== undefined) {
           tl.kill();
           tl.clear();
@@ -55,15 +58,19 @@ type Timeline = gsap.core.Timeline;
         const initTimeline = () => {
           const tl = gsap.timeline();
 
-          tl.set(split.words, {
+          tl.set(splittedElements, {
             opacity: fromOpacity || '0.08',
             x: fromX || '0%',
             y: fromY || '100%',
           }).add('start');
 
-          tl.to(split.words, { opacity: '1', x: '0%', y: '0%', stagger: 0.1, delay: 0.2 }).add(
-            'end'
-          );
+          tl.to(splittedElements, {
+            opacity: '1',
+            x: '0%',
+            y: '0%',
+            stagger: 0.05,
+            delay: 0.2,
+          }).add('end');
           tl.pause();
           return tl;
         };
