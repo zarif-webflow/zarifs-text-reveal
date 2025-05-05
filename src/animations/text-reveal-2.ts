@@ -33,76 +33,97 @@ type Timeline = gsap.core.Timeline;
       viewThreshold,
     } = getAnimationValues(charRevealEl);
 
-    let tl: Timeline | undefined = undefined;
-    let scrollTrig: globalThis.ScrollTrigger | undefined = undefined;
+    let ctx: gsap.Context | undefined = undefined;
 
-    const split = SplitText.create(charRevealEl, {
+    let tl: Timeline | undefined = undefined;
+    let splitter: globalThis.SplitText | undefined = undefined;
+    let splittedElements: Element[] | undefined = undefined;
+
+    const commonSplitProps: SplitText.Vars = {
       type: revealType === 'chars' ? 'words, chars' : revealType,
       autoSplit: true,
-      mask: revealType,
+      mask: revealType === 'chars' ? 'words' : revealType,
       smartWrap: true,
-      onSplit: (split) => {
-        const splittedElements = split[revealType];
+      wordsClass: 'split-word',
+    };
 
-        if (tl !== undefined) {
-          tl.kill();
-          tl.clear();
-          tl = undefined;
-        }
+    const destroyTimeline = () => {
+      if (tl) {
+        tl.revert();
+        tl.kill();
+        tl.clear();
+        tl = undefined;
+      }
+      if (ctx) {
+        ctx.revert();
+        ctx = undefined;
+      }
+    };
 
-        if (scrollTrig !== undefined) {
-          scrollTrig.kill(true);
-          scrollTrig = undefined;
-        }
+    const initTimeline = () => {
+      ctx = gsap.context(() => {
+        tl = gsap.timeline({ paused: true });
 
-        const initTimeline = () => {
-          const tl = gsap.timeline();
+        tl.set(splittedElements!, {
+          opacity: fromOpacity || '0.08',
+          x: fromX || '0%',
+          y: fromY || '100%',
+        }).add('start');
 
-          tl.set(splittedElements, {
-            opacity: fromOpacity || '0.08',
-            x: fromX || '0%',
-            y: fromY || '100%',
-          }).add('start');
+        tl.to(splittedElements!, {
+          opacity: '1',
+          x: '0%',
+          y: '0%',
+          stagger: 0.05,
+          delay: 0.2,
+        }).add('end');
+      });
+    };
 
-          tl.to(splittedElements, {
-            opacity: '1',
-            x: '0%',
-            y: '0%',
-            stagger: 0.05,
-            delay: 0.2,
-          }).add('end');
-          tl.pause();
-          return tl;
-        };
+    const resetSplitAnimation = () => {
+      destroyTimeline();
+      splitter?.revert();
+    };
 
-        tl = initTimeline();
+    const getSplitter = () => {
+      return SplitText.create(charRevealEl, {
+        ...commonSplitProps,
+        onSplit: (split) => {
+          splittedElements = split[revealType];
 
-        const onEnter = () => {
-          tl!.restart(true).then(() => {
-            if (!shouldAnimationRestart) split.revert();
-          });
-        };
-        const onEnterBack = () => {
-          if (!shouldAnimationRestart) return;
+          initTimeline();
+        },
+      });
+    };
 
-          tl!.restart(true).then(() => {
-            if (!shouldAnimationRestart) split.revert();
-          });
-        };
-        const onLeave = () => {
-          if (!shouldAnimationRestart) return;
+    splitter = getSplitter();
 
-          tl!.progress(0.001);
-        };
+    const onEnter = () => {
+      if (!tl) return;
 
-        scrollTrig = ScrollTrigger.create({
-          trigger: charRevealParentEl,
-          onEnter: onEnter,
-          onEnterBack: onEnterBack,
-          onLeave: onLeave,
-          once: !shouldAnimationRestart,
-        });
-      },
+      tl.restart(true).then(() => {
+        resetSplitAnimation();
+      });
+    };
+    const onEnterBack = () => {
+      if (!shouldAnimationRestart || !tl) return;
+
+      tl.restart(true).then(() => {
+        resetSplitAnimation();
+      });
+    };
+    const onLeave = () => {
+      if (!shouldAnimationRestart) return;
+      resetSplitAnimation();
+      splitter = getSplitter();
+    };
+
+    ScrollTrigger.create({
+      trigger: charRevealParentEl,
+      onEnter: onEnter,
+      onEnterBack: onEnterBack,
+      onLeave: onLeave,
+      once: !shouldAnimationRestart,
     });
   }
 })();
