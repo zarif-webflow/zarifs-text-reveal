@@ -1,3 +1,4 @@
+import { wait } from '@finsweet/ts-utils';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
@@ -11,7 +12,7 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
 
 type Timeline = gsap.core.Timeline;
 
-(async () => {
+const init = () => {
   for (let i = 0; i < charRevealElements.length; i++) {
     const charRevealEl = charRevealElements[i]!;
 
@@ -33,18 +34,36 @@ type Timeline = gsap.core.Timeline;
       viewThreshold,
     } = getAnimationValues(charRevealEl, undefined, charRevealParentEl);
 
+    let initialAnimationProps: GsapTweenVars = {};
+    let finalAnimationProps: GsapTweenVars = {};
+
+    if (animationType === 'from-bottom') {
+      initialAnimationProps.y = '100%';
+
+      finalAnimationProps.y = '0%';
+    } else if (animationType === 'from-top') {
+      initialAnimationProps.y = '-100%';
+
+      finalAnimationProps.y = '0%';
+    } else if (animationType === 'fade-from-bottom-left') {
+      initialAnimationProps.y = fromY || '30%';
+      initialAnimationProps.x = fromX || '-50px';
+      initialAnimationProps.opacity = fromOpacity || '0.05';
+
+      finalAnimationProps.y = '0%';
+      finalAnimationProps.x = '0%';
+      finalAnimationProps.opacity = '1';
+    }
+
+    finalAnimationProps.delay = delay;
+    finalAnimationProps.duration = duration;
+    finalAnimationProps.ease = easing;
+    finalAnimationProps.stagger = staggerDelay;
+
     let ctx: gsap.Context | undefined = undefined;
     let tl: Timeline | undefined = undefined;
     let splitter: globalThis.SplitText | undefined = undefined;
     let splittedElements: Element[] | undefined = undefined;
-
-    const commonSplitProps: SplitText.Vars = {
-      type: revealType === 'chars' ? 'words, chars' : revealType,
-      autoSplit: true,
-      mask: revealType === 'chars' ? 'words' : revealType,
-      smartWrap: true,
-      wordsClass: 'split-word',
-    };
 
     const destroyTimeline = () => {
       if (tl) {
@@ -61,19 +80,9 @@ type Timeline = gsap.core.Timeline;
       ctx = gsap.context(() => {
         tl = gsap.timeline({ paused: true });
 
-        tl.set(splittedElements!, {
-          opacity: fromOpacity || '0.08',
-          x: fromX || '0%',
-          y: fromY || '100%',
-        }).add('start');
+        tl.set(splittedElements!, initialAnimationProps).add('start');
 
-        tl.to(splittedElements!, {
-          opacity: '1',
-          x: '0%',
-          y: '0%',
-          stagger: 0.1,
-          delay: 0.2,
-        }).add('end');
+        tl.to(splittedElements!, finalAnimationProps).add('end');
 
         tl.progress(0.001);
       });
@@ -85,17 +94,25 @@ type Timeline = gsap.core.Timeline;
     };
 
     const getSplitter = () => {
-      return SplitText.create(charRevealEl, {
-        ...commonSplitProps,
+      const splitter = SplitText.create(charRevealEl, {
+        type: revealType === 'chars' ? 'words, chars' : revealType,
+        autoSplit: true,
+        mask:
+          animationType === 'fade-from-bottom-left'
+            ? undefined
+            : revealType === 'chars'
+              ? 'words'
+              : revealType,
+        smartWrap: true,
+        wordsClass: 'split-word',
         onSplit: (split) => {
           splittedElements = split[revealType];
-
           initTimeline();
         },
       });
+      charRevealEl.dataset.initialized = '';
+      return splitter;
     };
-
-    splitter = getSplitter();
 
     const onEnter = () => {
       if (!tl) return;
@@ -117,14 +134,32 @@ type Timeline = gsap.core.Timeline;
       splitter = getSplitter();
     };
 
-    ScrollTrigger.create({
-      trigger: charRevealParentEl,
-      onEnter: onEnter,
-      onEnterBack: onEnterBack,
-      onLeave: onLeave,
-      once: !shouldAnimationRestart,
-      markers: true,
-      start: `${Math.ceil(viewThreshold * 100)}% bottom`,
-    });
+    const initSplitSetup = () => {
+      splitter = getSplitter();
+
+      ScrollTrigger.create({
+        trigger: charRevealParentEl,
+        onEnter: onEnter,
+        onEnterBack: onEnterBack,
+        onLeave: onLeave,
+        once: !shouldAnimationRestart,
+        start: `${Math.ceil(viewThreshold * 100)}% bottom`,
+      });
+    };
+
+    if (!Number.isNaN(loaderDuration)) {
+      window.addEventListener('load', async () => {
+        const fontsReadyPromise = document.fonts.ready;
+        const loaderPromise = wait(loaderDuration);
+        await Promise.all([fontsReadyPromise, loaderPromise]);
+        initSplitSetup();
+      });
+    } else {
+      document.fonts.ready.then(() => {
+        initSplitSetup();
+      });
+    }
   }
-})();
+};
+
+init();
