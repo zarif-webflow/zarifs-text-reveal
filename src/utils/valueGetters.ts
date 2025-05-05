@@ -12,7 +12,8 @@ import {
 
 export const getAnimationValues = (
   element: HTMLElement,
-  defaultValues?: AnimationDataProps
+  defaultValues?: AnimationDataProps,
+  parentEl?: HTMLElement
 ): AnimationDataProps => {
   const {
     animationType,
@@ -27,6 +28,7 @@ export const getAnimationValues = (
     viewThreshold,
     resetAnimation,
   } = element.dataset as Record<AnimationDataKeys, string | undefined>;
+  const parentViewThreshold = parentEl?.dataset.viewThreshold;
 
   const selectedAnimationType = assert(
     animationType,
@@ -48,7 +50,7 @@ export const getAnimationValues = (
 
   const selectedDelay = fallback(Number.parseFloat(delay || ''), defaultValues?.delay ?? 0);
   const selectedViewThreshold = fallback(
-    Number.parseFloat(viewThreshold || ''),
+    Number.parseFloat(viewThreshold || parentViewThreshold || ''),
     defaultValues?.viewThreshold ?? 0.8
   );
   const selectedDuration = fallback(

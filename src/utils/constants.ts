@@ -11,12 +11,7 @@ const revealTypeValuesArray = ['chars', 'words', 'lines'] as const;
 export const revealTypeValuesSet: Set<string> = new Set(revealTypeValuesArray);
 export type RevealTypeValue = (typeof revealTypeValuesArray)[number];
 
-const animationTypeValuesArray = [
-  'from-top',
-  'from-bottom',
-  'from-left-bottom',
-  'fade-from-bottom-left',
-] as const;
+const animationTypeValuesArray = ['from-top', 'from-bottom', 'fade-from-bottom-left'] as const;
 export const animationTypeValuesSet: Set<string> = new Set(animationTypeValuesArray);
 export type AnimationTypeValue = (typeof animationTypeValuesArray)[number];
 

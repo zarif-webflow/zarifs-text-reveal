@@ -3,18 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="wf.css" />
     <!-- <script src="http://localhost:3000/index.js" defer></script> -->
     <!-- <script src="../../dist/index.js" defer></script>
     <script src="../../animations/scroll-direction-nav.js" defer></script> -->
     <script defer src="http://localhost:3000/animations/smooth-scroll.js"></script>
-    <script defer src="http://localhost:3000/animations/text-reveal.js"></script>
+    <script defer src="http://localhost:3000/animations/text-reveal-2.js"></script>
     <script defer src="http://localhost:3000/animations/scroll-direction-nav.js"></script>
-    <script defer src="http://localhost:3000/animations/modal.js"></script>
+    <!-- <script defer src="http://localhost:3000/animations/modal.js"></script> -->
     <title>Document</title>
   </head>
-  <body data-loader-duration="1000" data-reset-animation data-no-smooth-scroll>
+  <body data-loader-duration="1000" data-no-smooth-scroll>
     <div
       data-navbar
       style="
@@ -28,7 +34,7 @@
     >
       .
     </div>
-    <button data-stop-scroll data-open-modal="">Open Modal</button>
+    <!-- <button data-stop-scroll data-open-modal="">Open Modal</button>
     <div
       data-modal
       style="
@@ -49,18 +55,19 @@
           Close modal
         </button>
       </div>
-    </div>
+    </div> -->
     <!-- <div class="loader">Loading</div> -->
     <div class="container">
       <div>
         <button data-toggle-scroll="">Toggle Scroll</button>
+        <button data-stop>stop</button>
       </div>
-      <div class="char-animation-wrapper" data-reveal-parent>
+      <div class="char-animation-wrapper" data-reveal-parent data-reset-animation>
         <h1
           class="char-animation"
           data-reveal-type="chars"
           data-animation-type="from-bottom"
-          data-stagger-delay="0.03"
+          data-stagger-delay="0.05"
           data-duration="0.7"
           data-toggle-scroll=""
         >
@@ -82,7 +89,7 @@
       </div>
     </div>
     <div class="container">
-      <div class="char-animation-wrapper" data-reveal-parent>
+      <div class="char-animation-wrapper" data-reveal-parent data-view-threshold="0.5">
         <h1
           class="char-animation"
           data-reveal-type="lines"

@@ -1,20 +1,33 @@
-import SplitType from 'split-type';
+import { wait } from '@finsweet/ts-utils';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
 
 import { selectors } from '@/utils/constants';
 import { gsap } from '@/utils/gsap';
 import type { GsapTweenVars } from '@/utils/types';
 import { getAnimationValues } from '@/utils/valueGetters';
 
+// All the target split animation elements
 const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
+// Page Loader duration if there is Any
 const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '');
+const doesLoaderExist = !Number.isNaN(loaderDuration);
 
-(async () => {
+type Timeline = gsap.core.Timeline;
+
+const init = () => {
   for (let i = 0; i < charRevealElements.length; i++) {
+    // Target Reveal Element
     const charRevealEl = charRevealElements[i]!;
 
-    const charRevealParentEl = charRevealEl.closest<HTMLElement>(selectors.revealParent);
+    // Target's Common Parent Element
+    const charRevealParentEl =
+      charRevealEl.closest<HTMLElement>(selectors.revealParent) || charRevealEl;
+    // Target's Parent Element for Resetting the Animation
     const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
+    const shouldAnimationRestart = resetAnimationParent !== null;
 
+    // All Target Data Properties
     const {
       animationType,
       delay,
@@ -26,172 +39,154 @@ const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '
       fromY,
       fromOpacity,
       viewThreshold,
-    } = getAnimationValues(charRevealEl);
+    } = getAnimationValues(charRevealEl, undefined, charRevealParentEl);
 
-    const splitText = SplitType.create(charRevealEl, { types: 'words,chars' });
+    let initialAnimationProps: GsapTweenVars = {};
+    let finalAnimationProps: GsapTweenVars = {};
 
-    const initialWordElements = splitText.words || [];
-    const wordElements: HTMLElement[] = [];
+    if (animationType === 'from-bottom') {
+      initialAnimationProps.y = '100%';
 
-    for (let j = 0; j < initialWordElements.length; j++) {
-      const el = initialWordElements[j];
+      finalAnimationProps.y = '0%';
+    } else if (animationType === 'from-top') {
+      initialAnimationProps.y = '-100%';
 
-      const parentEl = document.createElement('span');
-      const cloneEl = el.cloneNode(true) as HTMLElement;
+      finalAnimationProps.y = '0%';
+    } else if (animationType === 'fade-from-bottom-left') {
+      initialAnimationProps.y = fromY || '30%';
+      initialAnimationProps.x = fromX || '-50px';
+      initialAnimationProps.opacity = fromOpacity || '0.05';
 
-      parentEl.classList.add('reveal-parent');
-      parentEl.appendChild(cloneEl);
-      el.replaceWith(parentEl);
-      wordElements.push(cloneEl);
+      finalAnimationProps.y = '0%';
+      finalAnimationProps.x = '0%';
+      finalAnimationProps.opacity = '1';
     }
 
-    const charElements = [...charRevealEl.querySelectorAll<HTMLElement>('.char')];
+    finalAnimationProps.delay = delay;
+    finalAnimationProps.duration = duration;
+    finalAnimationProps.ease = easing;
+    finalAnimationProps.stagger = staggerDelay;
 
-    const targetElements =
-      (revealType === 'lines' || revealType === 'words' ? wordElements : charElements) || [];
+    // Stored GSAP and Split Elements
+    let ctx: gsap.Context | undefined = undefined;
+    let tl: Timeline | undefined = undefined;
+    let splitter: globalThis.SplitText | undefined = undefined;
+    let splittedElements: Element[] | undefined = undefined;
 
-    const tweenProps: GsapTweenVars = {
-      delay,
-      stagger: staggerDelay,
-      ease: easing,
-      duration,
+    // Destroys the Animation Timeline
+    const destroyTimeline = () => {
+      if (tl) {
+        tl.revert();
+        tl = undefined;
+      }
+      if (ctx) {
+        ctx.revert();
+        ctx = undefined;
+      }
     };
 
-    const getAnimationProps = (
-      transition: boolean = false,
-      overwrite?: boolean | 'auto' | undefined
-    ) => {
-      let animationsProps: GsapTweenVars = { overwrite };
+    // Initializes The Animation Timeline
+    const initTimeline = () => {
+      ctx = gsap.context(() => {
+        tl = gsap.timeline({ paused: true });
 
-      if (animationType === 'from-bottom') {
-        animationsProps.yPercent = 100;
-        animationsProps.duration = transition ? duration : 0;
-      }
+        tl.set(splittedElements!, initialAnimationProps).add('start');
 
-      if (animationType === 'from-top') {
-        animationsProps.yPercent = -100;
-        animationsProps.duration = transition ? duration : 0;
-      }
+        tl.to(splittedElements!, finalAnimationProps).add('end');
 
-      if (animationType === 'fade-from-bottom-left') {
-        animationsProps.y = fromY || '30%';
-        animationsProps.x = fromX || '-50px';
-        animationsProps.opacity = fromOpacity || '0.05';
-        animationsProps.duration = transition ? duration : 0;
-      }
-
-      return animationsProps;
-    };
-
-    gsap.to(targetElements, getAnimationProps(false, 'auto'));
-
-    /* Remove initial invisibility */
-    charRevealEl.dataset.initialized = '';
-
-    let allLines: HTMLElement[][] = [];
-
-    if (revealType === 'lines') {
-      let currentLineTopRect = 0;
-      let currentLineWords: HTMLElement[] = [];
-      const resOb = new ResizeObserver((entries) => {
-        for (let entryIndex = 0; entryIndex < entries.length; entryIndex++) {
-          for (let k = 0; k < wordElements.length; k++) {
-            const wordElement = wordElements[k];
-            const wordTopRect = wordElement.getBoundingClientRect().top;
-
-            if (wordTopRect === currentLineTopRect) {
-              currentLineWords.push(wordElement);
-            } else {
-              currentLineTopRect = wordTopRect;
-              currentLineWords.length > 0 && allLines.push(currentLineWords);
-              currentLineWords = [wordElement];
-            }
-          }
-          allLines.push(currentLineWords);
-        }
+        // To show tl "Start" state
+        tl.progress(0.001);
       });
+    };
 
-      resOb.observe(charRevealEl);
-    }
+    // For Resetting the entire split animation
+    const resetSplitAnimation = () => {
+      destroyTimeline();
+      splitter?.revert();
+    };
 
-    const shouldAnimationReset = resetAnimationParent !== null;
-
-    const targetObserverElement = charRevealParentEl || charRevealEl;
-
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            if (revealType === 'lines' && allLines.length > 0) {
-              for (let i = 0; i < allLines.length; i++) {
-                const line = allLines[i];
-                for (let j = 0; j < line.length; j++) {
-                  const delayPropValue = (tweenProps.delay as number) || 0;
-                  const staggerPropValue = (tweenProps.stagger as number) || 0;
-
-                  const delay = delayPropValue + i * staggerPropValue;
-
-                  const word = line[j];
-
-                  gsap.to(word, {
-                    ...tweenProps,
-                    y: 0,
-                    yPercent: 0,
-                    x: 0,
-                    opacity: 1,
-                    delay,
-                    stagger: 0,
-                    overwrite: 'auto',
-                  });
-                }
-              }
-            } else {
-              gsap.to(targetElements, {
-                ...tweenProps,
-                y: 0,
-                yPercent: 0,
-                x: 0,
-                opacity: 1,
-                overwrite: 'auto',
-              });
-            }
-
-            if (!shouldAnimationReset) {
-              revealObserver.unobserve(entry.target);
-            }
-          }
-        }
-      },
-      {
-        threshold: viewThreshold,
-      }
-    );
-
-    let resetObserver: IntersectionObserver | undefined = undefined;
-
-    if (shouldAnimationReset) {
-      resetObserver = new IntersectionObserver(
-        (entries) => {
-          // eslint-disable-next-line
-          for (const entry of entries) {
-            if (entry.isIntersecting) return;
-            gsap.to(targetElements, getAnimationProps(false, true));
-          }
+    // For initializing the splitter element
+    const getSplitter = () => {
+      const splitter = SplitText.create(charRevealEl, {
+        type: revealType === 'chars' ? 'words, chars' : revealType,
+        autoSplit: true,
+        // No mask if fade-from-bottom-left
+        mask:
+          animationType === 'fade-from-bottom-left'
+            ? undefined
+            : revealType === 'chars'
+              ? 'words'
+              : revealType,
+        smartWrap: true,
+        // Words Class. It should have width=max-content
+        wordsClass: 'split-word',
+        onSplit: (split) => {
+          splittedElements = split[revealType];
+          initTimeline();
         },
-        { threshold: 0 }
-      );
-    }
+      });
+      // For fixing the initial splash before javascript loads. The following css should be active.
+      /*
+      [data-reveal-type]:not([data-initialized]) {
+        visibility: hidden;
+      }
+      */
+      charRevealEl.dataset.initialized = '';
+      return splitter;
+    };
 
-    if (!Number.isNaN(loaderDuration)) {
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          revealObserver.observe(targetObserverElement);
-          resetObserver?.observe(targetObserverElement);
-        }, loaderDuration);
+    const onEnter = () => {
+      if (!tl) return;
+
+      // After the animation completes, it will revert to original state
+      tl.restart(true).then(() => {
+        resetSplitAnimation();
+      });
+    };
+    const onEnterBack = () => {
+      if (!shouldAnimationRestart || !tl) return;
+
+      // After the animation completes, it will revert to original state
+      tl.restart(true).then(() => {
+        resetSplitAnimation();
+      });
+    };
+    const onLeave = () => {
+      if (!shouldAnimationRestart) return;
+      resetSplitAnimation();
+      // Create the split animation again upon leaving the viewport
+      splitter = getSplitter();
+    };
+
+    const initSplitSetup = () => {
+      // Initial Split Animation Setup
+      splitter = getSplitter();
+
+      // Scroll Trigger Setup for triggering the reveal animations
+      ScrollTrigger.create({
+        trigger: charRevealParentEl,
+        onEnter: onEnter,
+        onEnterBack: onEnterBack,
+        onLeave: onLeave,
+        once: !shouldAnimationRestart,
+        start: `${Math.ceil(viewThreshold * 100)}% bottom`,
+      });
+    };
+
+    if (doesLoaderExist) {
+      // Wait for loader and fonts to finish, then setup the animation
+      window.addEventListener('load', async () => {
+        const fontsReadyPromise = document.fonts.ready;
+        const loaderPromise = wait(loaderDuration);
+        await Promise.all([fontsReadyPromise, loaderPromise]);
+        initSplitSetup();
       });
     } else {
-      revealObserver.observe(targetObserverElement);
-      resetObserver?.observe(targetObserverElement);
+      document.fonts.ready.then(() => {
+        initSplitSetup();
+      });
     }
   }
-})();
+};
+
+init();

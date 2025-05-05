@@ -37,3 +37,5 @@ export const fallback = <T>(
 
   return value;
 };
+
+export const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
