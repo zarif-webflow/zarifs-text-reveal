@@ -31,10 +31,9 @@ type Timeline = gsap.core.Timeline;
       fromY,
       fromOpacity,
       viewThreshold,
-    } = getAnimationValues(charRevealEl);
+    } = getAnimationValues(charRevealEl, undefined, charRevealParentEl);
 
     let ctx: gsap.Context | undefined = undefined;
-
     let tl: Timeline | undefined = undefined;
     let splitter: globalThis.SplitText | undefined = undefined;
     let splittedElements: Element[] | undefined = undefined;
@@ -50,8 +49,6 @@ type Timeline = gsap.core.Timeline;
     const destroyTimeline = () => {
       if (tl) {
         tl.revert();
-        tl.kill();
-        tl.clear();
         tl = undefined;
       }
       if (ctx) {
@@ -74,9 +71,11 @@ type Timeline = gsap.core.Timeline;
           opacity: '1',
           x: '0%',
           y: '0%',
-          stagger: 0.05,
+          stagger: 0.1,
           delay: 0.2,
         }).add('end');
+
+        tl.progress(0.001);
       });
     };
 
@@ -124,6 +123,8 @@ type Timeline = gsap.core.Timeline;
       onEnterBack: onEnterBack,
       onLeave: onLeave,
       once: !shouldAnimationRestart,
+      markers: true,
+      start: `${Math.ceil(viewThreshold * 100)}% bottom`,
     });
   }
 })();
