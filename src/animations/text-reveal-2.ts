@@ -7,20 +7,27 @@ import { gsap } from '@/utils/gsap';
 import type { GsapTweenVars } from '@/utils/types';
 import { getAnimationValues } from '@/utils/valueGetters';
 
+// All the target split animation elements
 const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
+// Page Loader duration if there is Any
 const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '');
+const doesLoaderExist = !Number.isNaN(loaderDuration);
 
 type Timeline = gsap.core.Timeline;
 
 const init = () => {
   for (let i = 0; i < charRevealElements.length; i++) {
+    // Target Reveal Element
     const charRevealEl = charRevealElements[i]!;
 
+    // Target's Common Parent Element
     const charRevealParentEl =
       charRevealEl.closest<HTMLElement>(selectors.revealParent) || charRevealEl;
+    // Target's Parent Element for Resetting the Animation
     const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
     const shouldAnimationRestart = resetAnimationParent !== null;
 
+    // All Target Data Properties
     const {
       animationType,
       delay,
@@ -60,11 +67,13 @@ const init = () => {
     finalAnimationProps.ease = easing;
     finalAnimationProps.stagger = staggerDelay;
 
+    // Stored GSAP and Split Elements
     let ctx: gsap.Context | undefined = undefined;
     let tl: Timeline | undefined = undefined;
     let splitter: globalThis.SplitText | undefined = undefined;
     let splittedElements: Element[] | undefined = undefined;
 
+    // Destroys the Animation Timeline
     const destroyTimeline = () => {
       if (tl) {
         tl.revert();
@@ -76,6 +85,7 @@ const init = () => {
       }
     };
 
+    // Initializes The Animation Timeline
     const initTimeline = () => {
       ctx = gsap.context(() => {
         tl = gsap.timeline({ paused: true });
@@ -84,19 +94,23 @@ const init = () => {
 
         tl.to(splittedElements!, finalAnimationProps).add('end');
 
+        // To show tl "Start" state
         tl.progress(0.001);
       });
     };
 
+    // For Resetting the entire split animation
     const resetSplitAnimation = () => {
       destroyTimeline();
       splitter?.revert();
     };
 
+    // For initializing the splitter element
     const getSplitter = () => {
       const splitter = SplitText.create(charRevealEl, {
         type: revealType === 'chars' ? 'words, chars' : revealType,
         autoSplit: true,
+        // No mask if fade-from-bottom-left
         mask:
           animationType === 'fade-from-bottom-left'
             ? undefined
@@ -104,12 +118,19 @@ const init = () => {
               ? 'words'
               : revealType,
         smartWrap: true,
+        // Words Class. It should have width=max-content
         wordsClass: 'split-word',
         onSplit: (split) => {
           splittedElements = split[revealType];
           initTimeline();
         },
       });
+      // For fixing the initial splash before javascript loads. The following css should be active.
+      /*
+      [data-reveal-type]:not([data-initialized]) {
+        visibility: hidden;
+      }
+      */
       charRevealEl.dataset.initialized = '';
       return splitter;
     };
@@ -117,6 +138,7 @@ const init = () => {
     const onEnter = () => {
       if (!tl) return;
 
+      // After the animation completes, it will revert to original state
       tl.restart(true).then(() => {
         resetSplitAnimation();
       });
@@ -124,6 +146,7 @@ const init = () => {
     const onEnterBack = () => {
       if (!shouldAnimationRestart || !tl) return;
 
+      // After the animation completes, it will revert to original state
       tl.restart(true).then(() => {
         resetSplitAnimation();
       });
@@ -131,12 +154,15 @@ const init = () => {
     const onLeave = () => {
       if (!shouldAnimationRestart) return;
       resetSplitAnimation();
+      // Create the split animation again upon leaving the viewport
       splitter = getSplitter();
     };
 
     const initSplitSetup = () => {
+      // Initial Split Animation Setup
       splitter = getSplitter();
 
+      // Scroll Trigger Setup for triggering the reveal animations
       ScrollTrigger.create({
         trigger: charRevealParentEl,
         onEnter: onEnter,
@@ -147,7 +173,8 @@ const init = () => {
       });
     };
 
-    if (!Number.isNaN(loaderDuration)) {
+    if (doesLoaderExist) {
+      // Wait for loader and fonts to finish, then setup the animation
       window.addEventListener('load', async () => {
         const fontsReadyPromise = document.fonts.ready;
         const loaderPromise = wait(loaderDuration);
