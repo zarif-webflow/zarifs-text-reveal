@@ -103,7 +103,3 @@ h1 .highlighted {
 .container.longer {
   height: 300vh;
 }
-
-.split-word {
-  width: max-content;
-}

@@ -1,29 +1,3 @@
-/* For Text Animations */
-
-[data-reveal-type] {
-  font-kerning: none;
-}
-
-/*
-Previous
-.reveal-parent {
-  display: inline-flex;
-  overflow-y: clip;
-  word-break: keep-all;
-}
-
-[data-remove-mask] .reveal-parent {
-  overflow-y: visible;
-}
-
-
-*/
-/* For Lenis Smooth Scroll */
-
-[data-reveal-type]:not([data-initialized]) {
-  visibility: hidden;
-}
-
 html.lenis,
 html.lenis body {
   height: auto;

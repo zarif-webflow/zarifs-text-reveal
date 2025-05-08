@@ -1,5 +1,4 @@
 import { wait } from '@finsweet/ts-utils';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
 import { selectors } from '@/utils/constants';
@@ -39,6 +38,7 @@ const init = () => {
       fromY,
       fromOpacity,
       viewThreshold,
+      keepSplit,
     } = getAnimationValues(charRevealEl, undefined, charRevealParentEl);
 
     let initialAnimationProps: GsapTweenVars = {};
@@ -120,6 +120,7 @@ const init = () => {
         smartWrap: true,
         // Words Class. It should have width=max-content
         wordsClass: 'split-word',
+        linesClass: 'split-line',
         onSplit: (split) => {
           splittedElements = split[revealType];
           initTimeline();
@@ -140,19 +141,14 @@ const init = () => {
 
       // After the animation completes, it will revert to original state
       tl.restart(true).then(() => {
+        if (keepSplit) return;
         resetSplitAnimation();
       });
     };
-    const onEnterBack = () => {
-      if (!shouldAnimationRestart || !tl) return;
 
-      // After the animation completes, it will revert to original state
-      tl.restart(true).then(() => {
-        resetSplitAnimation();
-      });
-    };
     const onLeave = () => {
       if (!shouldAnimationRestart) return;
+      if (keepSplit) return;
       resetSplitAnimation();
       // Create the split animation again upon leaving the viewport
       splitter = getSplitter();
@@ -162,15 +158,38 @@ const init = () => {
       // Initial Split Animation Setup
       splitter = getSplitter();
 
-      // Scroll Trigger Setup for triggering the reveal animations
-      ScrollTrigger.create({
-        trigger: charRevealParentEl,
-        onEnter: onEnter,
-        onEnterBack: onEnterBack,
-        onLeave: onLeave,
-        once: !shouldAnimationRestart,
-        start: `${Math.ceil(viewThreshold * 100)}% bottom`,
-      });
+      // On Viewport Enter
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              onEnter();
+              if (shouldAnimationRestart) return;
+              revealObserver.unobserve(entry.target);
+            }
+          }
+        },
+        {
+          threshold: viewThreshold,
+        }
+      );
+      revealObserver.observe(charRevealParentEl);
+
+      // On Viewport Leave
+      if (shouldAnimationRestart) {
+        const resetObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) return;
+              onLeave();
+            }
+          },
+          {
+            threshold: 0,
+          }
+        );
+        resetObserver.observe(charRevealParentEl);
+      }
     };
 
     if (doesLoaderExist) {

@@ -27,6 +27,7 @@ export type AnimationDataProps = {
   fromOpacity: string | undefined;
   viewThreshold: number;
   resetAnimation: string | undefined;
+  keepSplit: string | undefined;
 };
 
 export type AnimationDataKeys = keyof AnimationDataProps;
