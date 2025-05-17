@@ -24,12 +24,12 @@ export const fallback = <T>(
 ) => {
   if (value !== undefined && condition && !condition(value)) {
     //eslint-disable-next-line no-console
-    console.log(`"${value}" was not used, fallbacking to "${replacementValue}"`);
+    console.debug(`"${value}" was not used, fallbacking to "${replacementValue}"`);
     return replacementValue;
   }
   if (value === undefined || Number.isNaN(value)) {
     //eslint-disable-next-line no-console
-    console.log(`"${value}" was not used, fallbacking to "${replacementValue}"`);
+    console.debug(`"${value}" was not used, fallbacking to "${replacementValue}"`);
     return replacementValue;
   }
 

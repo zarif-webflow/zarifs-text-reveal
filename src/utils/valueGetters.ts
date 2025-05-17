@@ -1,4 +1,4 @@
-import { assert, fallback } from './common';
+import { fallback } from './common';
 import {
   type AnimationDataKeys,
   type AnimationDataProps,
@@ -30,9 +30,9 @@ export const getAnimationValues = (
   } = element.dataset as Record<AnimationDataKeys, string | undefined>;
   const parentViewThreshold = parentEl?.dataset.viewThreshold;
 
-  const selectedAnimationType = assert(
+  const selectedAnimationType = fallback(
     animationType,
-    'Animation type not found or invalid!',
+    defaultValues?.animationType ?? 'from-bottom',
     (value) => value !== undefined && animationTypeValuesSet.has(value)
   ) as AnimationTypeValue;
 

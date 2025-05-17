@@ -38,11 +38,6 @@ const init = () => {
     const charRevealParentEl =
       charRevealEl.closest<HTMLElement>(selectors.revealParent) || charRevealEl;
 
-    // Check if animation should restart when element leaves viewport
-    // Elements with data-reset-animation will restart animation when they re-enter viewport
-    const resetAnimationParent = charRevealEl.closest<HTMLElement>(selectors.resetAnimation);
-    const shouldAnimationRestart = resetAnimationParent !== null;
-
     // Extract animation configuration from data attributes
     // These values determine how the animation will behave
     const {
@@ -63,17 +58,33 @@ const init = () => {
      * Checks data-keep-split on element or closest ancestor with that attribute
      */
     const getKeepSplit = () => {
-      let keepSplitValue =
+      let value =
         charRevealEl.dataset.keepSplit ||
         charRevealEl.closest<HTMLElement>('[data-keep-split]')?.dataset.keepSplit;
 
-      if (keepSplitValue === 'true') return true;
-      if (keepSplitValue === 'false') return false;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
 
       return false;
     };
 
-    let keepSplit = getKeepSplit();
+    /**
+     * Determine if animation should reset when element leaves viewport
+     * Checks data-reset-animation on element or closest ancestor with that attribute
+     */
+    const getResetAnimation = () => {
+      let value =
+        charRevealEl.dataset.resetAnimation ||
+        charRevealEl.closest<HTMLElement>('[data-reset-animation]')?.dataset.resetAnimation;
+
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+
+      return false;
+    };
+
+    const keepSplit = getKeepSplit();
+    const shouldAnimationReset = getResetAnimation();
 
     // Animation properties for initial (hidden) and final (visible) states
     let initialAnimationProps: GsapTweenVars = {};
@@ -236,7 +247,7 @@ const init = () => {
      * Handle element leaving viewport - reset for animations that should restart
      */
     const onLeave = () => {
-      if (!shouldAnimationRestart) return;
+      if (!shouldAnimationReset) return;
 
       resetSplitAnimation();
       // Recreate split text when element leaves viewport
@@ -257,7 +268,7 @@ const init = () => {
             if (entry.isIntersecting) {
               onEnter();
               // If animation doesn't restart, we don't need to observe anymore
-              if (shouldAnimationRestart) return;
+              if (shouldAnimationReset) return;
               revealObserver.unobserve(entry.target);
             }
           }
@@ -269,7 +280,7 @@ const init = () => {
       revealObserver.observe(charRevealParentEl);
 
       // For restart animations, create observer to detect when element leaves viewport
-      if (shouldAnimationRestart) {
+      if (shouldAnimationReset) {
         const resetObserver = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
