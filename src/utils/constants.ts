@@ -5,6 +5,7 @@ export const selectors = {
   startScroll: '[data-start-scroll]',
   stopScroll: '[data-stop-scroll]',
   resetAnimation: '[data-reset-animation]',
+  keepSplit: '[data-reset-animation]',
 } as const;
 
 const revealTypeValuesArray = ['chars', 'words', 'lines'] as const;
@@ -27,7 +28,6 @@ export type AnimationDataProps = {
   fromOpacity: string | undefined;
   viewThreshold: number;
   resetAnimation: string | undefined;
-  keepSplit: string | undefined;
 };
 
 export type AnimationDataKeys = keyof AnimationDataProps;

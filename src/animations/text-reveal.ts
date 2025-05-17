@@ -38,8 +38,20 @@ const init = () => {
       fromY,
       fromOpacity,
       viewThreshold,
-      keepSplit,
     } = getAnimationValues(charRevealEl, undefined, charRevealParentEl);
+
+    const getKeepSplit = () => {
+      let keepSplitValue =
+        charRevealEl.dataset.keepSplit ||
+        charRevealEl.closest<HTMLElement>('[data-keep-split]')?.dataset.keepSplit;
+
+      if (keepSplitValue === 'true') return true;
+      if (keepSplitValue === 'false') return false;
+
+      return false;
+    };
+
+    let keepSplit = getKeepSplit();
 
     let initialAnimationProps: GsapTweenVars = {};
     let finalAnimationProps: GsapTweenVars = {};
@@ -103,10 +115,32 @@ const init = () => {
     const resetSplitAnimation = () => {
       destroyTimeline();
       splitter?.revert();
+
+      if (revealType === 'lines' && !keepSplit) {
+        fixLineLayoutShiftAfterRevert();
+      }
+    };
+
+    // Take Line Animation Layout Shift into account
+    const fixLineLayoutShiftBeforeSplit = () => {
+      const charRevealElWidth = charRevealEl.offsetWidth + 'px';
+
+      charRevealEl.style.width = charRevealElWidth;
+      charRevealEl.style.minWidth = charRevealElWidth;
+    };
+
+    const fixLineLayoutShiftAfterRevert = () => {
+      charRevealEl.style.removeProperty('width');
+      charRevealEl.style.removeProperty('min-width');
     };
 
     // For initializing the splitter element
     const getSplitter = () => {
+      // Fixes the layout shift before split
+      if (revealType === 'lines' && !keepSplit) {
+        fixLineLayoutShiftBeforeSplit();
+      }
+
       const splitter = SplitText.create(charRevealEl, {
         type: revealType === 'chars' ? 'words, chars' : revealType,
         autoSplit: true,
@@ -119,8 +153,9 @@ const init = () => {
               : revealType,
         smartWrap: true,
         // Words Class. It should have width=max-content
-        wordsClass: 'split-word',
-        linesClass: 'split-line',
+        charsClass: 'split-chars',
+        wordsClass: 'split-words',
+        linesClass: 'split-lines',
         onSplit: (split) => {
           splittedElements = split[revealType];
           initTimeline();
@@ -148,7 +183,7 @@ const init = () => {
 
     const onLeave = () => {
       if (!shouldAnimationRestart) return;
-      if (keepSplit) return;
+
       resetSplitAnimation();
       // Create the split animation again upon leaving the viewport
       splitter = getSplitter();

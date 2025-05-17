@@ -27,7 +27,6 @@ export const getAnimationValues = (
     fromOpacity,
     viewThreshold,
     resetAnimation,
-    keepSplit,
   } = element.dataset as Record<AnimationDataKeys, string | undefined>;
   const parentViewThreshold = parentEl?.dataset.viewThreshold;
 
@@ -75,6 +74,5 @@ export const getAnimationValues = (
     fromOpacity,
     viewThreshold: selectedViewThreshold,
     resetAnimation,
-    keepSplit,
   };
 };

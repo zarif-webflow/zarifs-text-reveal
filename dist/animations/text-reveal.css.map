@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/animations/text-reveal.css"],
+  "sourcesContent": ["[data-reveal-type]:not([data-initialized]) {\r\n  visibility: hidden;\r\n}\r\n\r\n[data-reveal-type='chars'] {\r\n  font-kerning: none;\r\n}\r\n\r\n.split-words {\r\n  white-space: nowrap;\r\n}\r\n\r\n.split-mask-words-mask,\r\n.split-mask-lines-mask {\r\n  overflow-y: clip !important;\r\n  overflow-x: visible !important;\r\n}\r\n"],
+  "mappings": ";AAAA,CAAC,iBAAiB,KAAK,CAAC;AACtB,cAAY;AACd;AAEA,CAAC;AACC,gBAAc;AAChB;AAEA,CAAC;AACC,eAAa;AACf;AAEA,CAAC;AACD,CAAC;AACC,cAAY;AACZ,cAAY;AACd;",
+  "names": []
+}

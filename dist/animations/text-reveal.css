@@ -1,0 +1,16 @@
+/* src/animations/text-reveal.css */
+[data-reveal-type]:not([data-initialized]) {
+  visibility: hidden;
+}
+[data-reveal-type=chars] {
+  font-kerning: none;
+}
+.split-words {
+  white-space: nowrap;
+}
+.split-mask-words-mask,
+.split-mask-lines-mask {
+  overflow-y: clip !important;
+  overflow-x: visible !important;
+}
+/*# sourceMappingURL=text-reveal.css.map */

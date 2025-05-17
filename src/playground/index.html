@@ -10,7 +10,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="text-reveal.css" />
+    <link
+      href="http://localhost:3000/animations/text-reveal.css"
+      rel="stylesheet"
+      type="text/css"
+    />
     <link rel="stylesheet" href="wf.css" />
     <!-- <script src="http://localhost:3000/index.js" defer></script> -->
     <!-- <script src="../../dist/index.js" defer></script>
@@ -58,7 +62,7 @@
       </div>
     </div> -->
     <!-- <div class="loader">Loading</div> -->
-    <div class="container">
+    <div class="container" data-keep-split="true">
       <div>
         <button data-toggle-scroll="">Toggle Scroll</button>
         <button data-stop>stop</button>
@@ -67,6 +71,7 @@
         class="char-animation-wrapper"
         data-reveal-parent
         data-reset-animation
+        data-keep-split="false"
         style="display: flex; justify-content: space-between; align-items: end"
       >
         <h1

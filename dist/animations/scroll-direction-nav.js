@@ -1,1 +1,86 @@
-"use strict";(()=>{var o=class{constructor({initialOffset:i,onDirectionChange:e}){this.onDirectionChange=void 0;this.scrollDirection="initial";this.initialOffset=120;this.removeListener=void 0;this.setupSubscriptions=()=>{window.addEventListener("scroll",this.handleScrollDirection),this.removeListener=()=>window.removeEventListener("scroll",this.handleScrollDirection)};this.handleScrollDirection=()=>{let i=window.scrollY,e="initial";i>this.initialOffset&&(i<this.scrollPosition?e="up":e="down"),e!==this.scrollDirection&&this.onDirectionChange?.(e),this.scrollPosition=i,this.scrollDirection=e};this.scrollPosition=0,i&&(this.initialOffset=i),this.onDirectionChange=e,this.setupSubscriptions()}dispose(){this.removeListener?.()}};var l=()=>{let n=document.querySelector("[data-navbar]");if(!n)return;let i=Number.parseFloat(n.dataset.initialOffset||""),e=Number.isNaN(i)?1:i;new o({initialOffset:e,onDirectionChange:t=>{if(t==="up"||t==="initial"){n.classList.remove("hide-navbar");return}n.classList.add("hide-navbar")}}),(()=>{let t=document.querySelector("[data-navbar]");if(!t)return;new IntersectionObserver(r=>{for(let s of r)s.isIntersecting?t?.classList.add("below--top"):t?.classList.remove("below--top")},{root:null,threshold:.1}).observe(document.body)})()};l();})();
+"use strict";
+(() => {
+  // bin/live-reload.js
+  new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
+
+  // src/utils/scroll-direction-manager.ts
+  var ScrollDirectionManager = class {
+    constructor({ initialOffset, onDirectionChange }) {
+      this.onDirectionChange = void 0;
+      this.scrollDirection = "initial";
+      this.initialOffset = 120;
+      this.removeListener = void 0;
+      this.setupSubscriptions = () => {
+        window.addEventListener("scroll", this.handleScrollDirection);
+        this.removeListener = () => window.removeEventListener("scroll", this.handleScrollDirection);
+      };
+      this.handleScrollDirection = () => {
+        const position = window.scrollY;
+        let direction = "initial";
+        if (position > this.initialOffset) {
+          if (position < this.scrollPosition) {
+            direction = "up";
+          } else {
+            direction = "down";
+          }
+        }
+        if (direction !== this.scrollDirection) {
+          this.onDirectionChange?.(direction);
+        }
+        this.scrollPosition = position;
+        this.scrollDirection = direction;
+      };
+      this.scrollPosition = 0;
+      if (initialOffset)
+        this.initialOffset = initialOffset;
+      this.onDirectionChange = onDirectionChange;
+      this.setupSubscriptions();
+    }
+    dispose() {
+      this.removeListener?.();
+    }
+  };
+
+  // src/animations/scroll-direction-nav.ts
+  var init = () => {
+    const navbar = document.querySelector("[data-navbar]");
+    if (!navbar)
+      return;
+    const parsedInitialOffset = Number.parseFloat(navbar.dataset.initialOffset || "");
+    const initialOffset = Number.isNaN(parsedInitialOffset) ? 1 : parsedInitialOffset;
+    new ScrollDirectionManager({
+      initialOffset,
+      onDirectionChange: (direction) => {
+        if (direction === "up" || direction === "initial") {
+          navbar.classList.remove("hide-navbar");
+          return;
+        }
+        navbar.classList.add("hide-navbar");
+      }
+    });
+    const initNavbarBgToggle = () => {
+      const navbar2 = document.querySelector("[data-navbar]");
+      if (!navbar2)
+        return;
+      const interSectionObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              navbar2?.classList.add("below--top");
+            } else {
+              navbar2?.classList.remove("below--top");
+            }
+          }
+        },
+        {
+          root: null,
+          threshold: 0.1
+        }
+      );
+      interSectionObserver.observe(document.body);
+    };
+    initNavbarBgToggle();
+  };
+  init();
+})();
+//# sourceMappingURL=scroll-direction-nav.js.map
