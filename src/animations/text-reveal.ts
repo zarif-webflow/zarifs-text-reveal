@@ -179,7 +179,6 @@ const init = () => {
       const rect = charRevealEl.getBoundingClientRect();
       const charRevealElWidth = rect.width + 'px';
 
-      charRevealEl.style.width = charRevealElWidth;
       charRevealEl.style.minWidth = charRevealElWidth;
     };
 
@@ -187,7 +186,6 @@ const init = () => {
      * Remove fixed width after animation reverts
      */
     const fixLineLayoutShiftAfterRevert = () => {
-      charRevealEl.style.removeProperty('width');
       charRevealEl.style.removeProperty('min-width');
     };
 
