@@ -5153,15 +5153,25 @@
       const shouldAnimationRestart = resetAnimationParent !== null;
       const {
         animationType,
+        // Type of animation (from-bottom, from-top, fade-from-bottom-left)
         delay,
+        // Delay before animation starts
         duration,
+        // Duration of animation
         easing,
+        // Easing function
         revealType,
+        // How text is split (chars, words, lines)
         staggerDelay,
+        // Delay between each animated element
         fromX,
+        // Starting X position for fade-from-bottom-left
         fromY,
+        // Starting Y position for fade-from-bottom-left
         fromOpacity,
+        // Starting opacity for fade-from-bottom-left
         viewThreshold
+        // Viewport threshold to trigger animation
       } = getAnimationValues(charRevealEl, void 0, charRevealParentEl);
       const getKeepSplit = () => {
         let keepSplitValue = charRevealEl.dataset.keepSplit || charRevealEl.closest("[data-keep-split]")?.dataset.keepSplit;
@@ -5235,15 +5245,19 @@
           fixLineLayoutShiftBeforeSplit();
         }
         const splitter2 = SplitText.create(charRevealEl, {
+          // For char animations, we need to split into words first, then chars
           type: revealType === "chars" ? "words, chars" : revealType,
-          autoSplit: true,
-          // No mask if fade-from-bottom-left
+          // To make lines responsive
+          autoSplit: revealType === "lines",
+          // Only use masks for from-top/from-bottom animations (not for fade animations)
           mask: animationType === "fade-from-bottom-left" ? void 0 : revealType === "chars" ? "words" : revealType,
-          smartWrap: true,
-          // Words Class. It should have width=max-content
+          // To make sure chars wont break
+          smartWrap: revealType === "chars",
+          // CSS classes for split elements
           charsClass: "split-chars",
           wordsClass: "split-words",
           linesClass: "split-lines",
+          // Initialize timeline when on split
           onSplit: (split) => {
             splittedElements = split[revealType];
             initTimeline();
@@ -5282,6 +5296,7 @@
           },
           {
             threshold: viewThreshold
+            // How much of element must be visible
           }
         );
         revealObserver.observe(charRevealParentEl);

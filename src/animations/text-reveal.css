@@ -1,15 +1,28 @@
+/* Hide elements that need animation until they are initialized
+   This prevents a flash of unstyled content (FOUC) during page load
+   Elements will become visible once JavaScript completes the SplitText setup */
 [data-reveal-type]:not([data-initialized]) {
   visibility: hidden;
 }
 
+/* Disable font kerning for character-based animations
+   This ensures each character maintains consistent spacing
+   during the animation, preventing layout shifts */
 [data-reveal-type='chars'] {
   font-kerning: none;
 }
 
+/* Prevent words from wrapping when split
+   Ensures words remain intact during animations
+   Critical for maintaining animation integrity */
 .split-words {
   white-space: nowrap;
 }
 
+/* Control overflow behavior for masked animations
+   - Clips vertically to hide content until revealed
+   - Allows horizontal overflow to prevent content cutoff
+   - Used by GSAP SplitText's mask feature for reveal effects */
 .split-mask-words-mask,
 .split-mask-lines-mask {
   overflow-y: clip !important;
