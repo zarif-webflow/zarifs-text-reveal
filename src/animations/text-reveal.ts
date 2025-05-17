@@ -171,9 +171,13 @@ const init = () => {
     /**
      * Fix layout shift for line animations by setting width before splitting
      * This prevents content jumps when text is split into lines
+     * Uses getBoundingClientRect() to get precise decimal pixel values instead of
+     * offsetWidth which rounds down to integers
      */
     const fixLineLayoutShiftBeforeSplit = () => {
-      const charRevealElWidth = charRevealEl.offsetWidth + 'px';
+      // Get exact width with decimal precision
+      const rect = charRevealEl.getBoundingClientRect();
+      const charRevealElWidth = rect.width + 'px';
 
       charRevealEl.style.width = charRevealElWidth;
       charRevealEl.style.minWidth = charRevealElWidth;
