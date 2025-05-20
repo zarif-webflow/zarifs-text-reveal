@@ -1,8 +1,6 @@
 import { wait } from '@finsweet/ts-utils';
-import { SplitText } from 'gsap/SplitText';
 
 import { selectors } from '@/utils/constants';
-import { gsap } from '@/utils/gsap';
 import type { GsapTweenVars } from '@/utils/types';
 import { getAnimationValues } from '@/utils/valueGetters';
 
@@ -27,7 +25,23 @@ type Timeline = gsap.core.Timeline;
 /**
  * Initialize text reveal animations
  */
+
 const init = () => {
+  try {
+    // eslint-disable-next-line no-console
+    console.debug('GSAP Version: ' + gsap.version);
+  } catch (error) {
+    throw new Error('GSAP is not imported. GSAP Script must be loaded before text-reveal script.');
+  }
+  try {
+    SplitText.name;
+  } catch (error) {
+    throw new Error(
+      'SplitText plugin is not registered. SplitText must be registered with GSAP to use text-reveal script.'
+    );
+  }
+  gsap.registerPlugin(SplitText);
+
   // Process each text reveal element
   for (let i = 0; i < charRevealElements.length; i++) {
     // Target element to animate
