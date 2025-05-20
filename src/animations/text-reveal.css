@@ -18,6 +18,9 @@
 .split-words {
   white-space: nowrap;
 }
+.split-word-nowrap {
+  white-space: nowrap;
+}
 
 /* Control overflow behavior for masked animations
    - Clips vertically to hide content until revealed

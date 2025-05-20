@@ -3,6 +3,7 @@ import { wait } from '@finsweet/ts-utils';
 import { selectors } from '@/utils/constants';
 import type { GsapTweenVars } from '@/utils/types';
 import { getAnimationValues } from '@/utils/valueGetters';
+import { wrapHyphenatedWords } from '@/utils/wrap-words';
 
 /**
  * Text Reveal Animation Module
@@ -31,16 +32,17 @@ const init = () => {
     // eslint-disable-next-line no-console
     console.debug('GSAP Version: ' + gsap.version);
   } catch (error) {
-    throw new Error('GSAP is not imported. GSAP Script must be loaded before text-reveal script.');
-  }
-  try {
-    SplitText.name;
-  } catch (error) {
     throw new Error(
-      'SplitText plugin is not registered. SplitText must be registered with GSAP to use text-reveal script.'
+      'GSAP is not imported. GSAP Script must be loaded before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText'
     );
   }
-  gsap.registerPlugin(SplitText);
+  try {
+    gsap.registerPlugin(SplitText);
+  } catch (error) {
+    throw new Error(
+      'SplitText plugin script is not imported. SplitText Script must be loaded after GSAP script and before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText'
+    );
+  }
 
   // Process each text reveal element
   for (let i = 0; i < charRevealElements.length; i++) {
@@ -209,6 +211,7 @@ const init = () => {
     const getSplitter = () => {
       // Fix layout issues for line animations
       if (revealType === 'lines' && !keepSplit) {
+        wrapHyphenatedWords(charRevealEl);
         fixLineLayoutShiftBeforeSplit();
       }
 
