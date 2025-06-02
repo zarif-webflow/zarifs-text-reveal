@@ -23,13 +23,9 @@ export const fallback = <T>(
   condition?: (value: T) => boolean
 ) => {
   if (value !== undefined && condition && !condition(value)) {
-    //eslint-disable-next-line no-console
-    console.debug(`"${value}" was not used, fallbacking to "${replacementValue}"`);
     return replacementValue;
   }
   if (value === undefined || Number.isNaN(value)) {
-    //eslint-disable-next-line no-console
-    console.debug(`"${value}" was not used, fallbacking to "${replacementValue}"`);
     return replacementValue;
   }
 

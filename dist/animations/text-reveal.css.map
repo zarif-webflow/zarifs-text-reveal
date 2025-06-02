@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/animations/text-reveal.css"],
-  "sourcesContent": ["/* Hide elements that need animation until they are initialized\r\n   This prevents a flash of unstyled content (FOUC) during page load\r\n   Elements will become visible once JavaScript completes the SplitText setup */\r\n[data-reveal-type]:not([data-initialized]) {\r\n  visibility: hidden;\r\n}\r\n\r\n/* Disable font kerning for character-based animations\r\n   This ensures each character maintains consistent spacing\r\n   during the animation, preventing layout shifts */\r\n[data-reveal-type='chars'] {\r\n  font-kerning: none;\r\n}\r\n\r\n/* Prevent words from wrapping when split\r\n   Ensures words remain intact during animations\r\n   Critical for maintaining animation integrity */\r\n.split-words {\r\n  white-space: nowrap;\r\n}\r\n.split-word-nowrap {\r\n  white-space: nowrap;\r\n}\r\n\r\n/* Control overflow behavior for masked animations\r\n   - Clips vertically to hide content until revealed\r\n   - Allows horizontal overflow to prevent content cutoff\r\n   - Used by GSAP SplitText's mask feature for reveal effects */\r\n.split-mask-words-mask,\r\n.split-mask-lines-mask {\r\n  overflow-y: clip !important;\r\n  overflow-x: visible !important;\r\n}\r\n"],
-  "mappings": ";AAGA,CAAC,iBAAiB,KAAK,CAAC;AACtB,cAAY;AACd;AAKA,CAAC;AACC,gBAAc;AAChB;AAKA,CAAC;AACC,eAAa;AACf;AACA,CAAC;AACC,eAAa;AACf;AAMA,CAAC;AACD,CAAC;AACC,cAAY;AACZ,cAAY;AACd;",
-  "names": []
-}
