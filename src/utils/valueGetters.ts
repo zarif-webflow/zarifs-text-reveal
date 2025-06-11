@@ -1,4 +1,4 @@
-import { fallback } from './common';
+import { fallback } from "./common";
 import {
   type AnimationDataKeys,
   type AnimationDataProps,
@@ -8,7 +8,7 @@ import {
   type GsapEaseType,
   type RevealTypeValue,
   revealTypeValuesSet,
-} from './constants';
+} from "./constants";
 
 export const getAnimationValues = (
   element: HTMLElement,
@@ -32,33 +32,33 @@ export const getAnimationValues = (
 
   const selectedAnimationType = fallback(
     animationType,
-    defaultValues?.animationType ?? 'from-bottom',
+    defaultValues?.animationType ?? "from-bottom",
     (value) => value !== undefined && animationTypeValuesSet.has(value)
   ) as AnimationTypeValue;
 
   const selectedRevealType = fallback(
     revealType,
-    defaultValues?.revealType ?? 'chars',
+    defaultValues?.revealType ?? "chars",
     (value) => value !== undefined && revealTypeValuesSet.has(value)
   ) as RevealTypeValue;
 
   const selectedEasing = fallback(
     easing,
-    defaultValues?.easing ?? 'powe3.out',
+    defaultValues?.easing ?? "powe3.out",
     (value) => value !== undefined && gsapEaseSet.has(value)
   ) as GsapEaseType;
 
-  const selectedDelay = fallback(Number.parseFloat(delay || ''), defaultValues?.delay ?? 0);
+  const selectedDelay = fallback(Number.parseFloat(delay || ""), defaultValues?.delay ?? 0);
   const selectedViewThreshold = fallback(
-    Number.parseFloat(viewThreshold || parentViewThreshold || ''),
+    Number.parseFloat(viewThreshold || parentViewThreshold || ""),
     defaultValues?.viewThreshold ?? 0.8
   );
   const selectedDuration = fallback(
-    Number.parseFloat(duration || ''),
+    Number.parseFloat(duration || ""),
     defaultValues?.duration ?? 0.5
   );
   const selectedStaggerDelay = fallback(
-    Number.parseFloat(staggerDelay || ''),
+    Number.parseFloat(staggerDelay || ""),
     defaultValues?.staggerDelay ?? 0.05
   );
 

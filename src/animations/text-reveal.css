@@ -8,7 +8,7 @@
 /* Disable font kerning for character-based animations
    This ensures each character maintains consistent spacing
    during the animation, preventing layout shifts */
-[data-reveal-type='chars'] {
+[data-reveal-type="chars"] {
   font-kerning: none;
 }
 

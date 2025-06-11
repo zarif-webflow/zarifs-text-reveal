@@ -2,7 +2,7 @@
  * Source Code: https://github.com/masaroli/scroll-direction-manager
  */
 
-export type ScrollDirection = 'initial' | 'up' | 'down';
+export type ScrollDirection = "initial" | "up" | "down";
 
 type ScrollDirectionManagerOptions = {
   initialOffset?: number;
@@ -21,10 +21,10 @@ type ScrollDirectionManagerOptions = {
  */
 
 export class ScrollDirectionManager {
-  private readonly onDirectionChange: ScrollDirectionManagerOptions['onDirectionChange'] =
+  private readonly onDirectionChange: ScrollDirectionManagerOptions["onDirectionChange"] =
     undefined;
   private scrollPosition: number;
-  private scrollDirection: ScrollDirection = 'initial';
+  private scrollDirection: ScrollDirection = "initial";
   private readonly initialOffset: number = 120;
   private removeListener: (() => void) | undefined = undefined;
 
@@ -36,19 +36,19 @@ export class ScrollDirectionManager {
   }
 
   private readonly setupSubscriptions = (): void => {
-    window.addEventListener('scroll', this.handleScrollDirection);
-    this.removeListener = () => window.removeEventListener('scroll', this.handleScrollDirection);
+    window.addEventListener("scroll", this.handleScrollDirection);
+    this.removeListener = () => window.removeEventListener("scroll", this.handleScrollDirection);
   };
 
   private readonly handleScrollDirection = (): void => {
     const position = window.scrollY;
-    let direction: ScrollDirection = 'initial';
+    let direction: ScrollDirection = "initial";
 
     if (position > this.initialOffset) {
       if (position < this.scrollPosition) {
-        direction = 'up';
+        direction = "up";
       } else {
-        direction = 'down';
+        direction = "down";
       }
     }
 

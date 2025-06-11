@@ -1,9 +1,11 @@
-import { wait } from '@finsweet/ts-utils';
+import "./text-reveal.css";
 
-import { selectors } from '@/utils/constants';
-import type { GsapTweenVars } from '@/utils/types';
-import { getAnimationValues } from '@/utils/valueGetters';
-import { wrapHyphenatedWords } from '@/utils/wrap-words';
+import { wait } from "@finsweet/ts-utils";
+import { afterWebflowReady, getGsap, type GSAPTweenVars, type GSAPType } from "@taj-wf/utils";
+
+import { selectors } from "@/utils/constants";
+import { getAnimationValues } from "@/utils/valueGetters";
+import { wrapHyphenatedWords } from "@/utils/wrap-words";
 
 /**
  * Text Reveal Animation Module
@@ -17,30 +19,28 @@ import { wrapHyphenatedWords } from '@/utils/wrap-words';
 const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
 
 // Check if page has a loader by parsing loader duration from body attribute
-const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? '');
+const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? "");
 const doesLoaderExist = !Number.isNaN(loaderDuration);
 
 // Type alias for GSAP timeline
-type Timeline = gsap.core.Timeline;
+type Timeline = ReturnType<GSAPType["timeline"]>;
 
 /**
  * Initialize text reveal animations
  */
 
-const init = () => {
-  try {
-    // eslint-disable-next-line no-console
-    console.debug('GSAP Version: ' + gsap.version);
-  } catch (error) {
+const initTextReveal = () => {
+  const [gsap, SplitText] = getGsap(["SplitText"]);
+
+  if (!gsap) {
     throw new Error(
-      'GSAP is not imported. GSAP Script must be loaded before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText'
+      "GSAP is not imported. GSAP Script must be loaded before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText"
     );
   }
-  try {
-    gsap.registerPlugin(SplitText);
-  } catch (error) {
+
+  if (!SplitText) {
     throw new Error(
-      'SplitText plugin script is not imported. SplitText Script must be loaded after GSAP script and before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText'
+      "SplitText plugin script is not imported. SplitText Script must be loaded after GSAP script and before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText"
     );
   }
 
@@ -74,12 +74,12 @@ const init = () => {
      * Checks data-keep-split on element or closest ancestor with that attribute
      */
     const getKeepSplit = () => {
-      let value =
+      const value =
         charRevealEl.dataset.keepSplit ||
-        charRevealEl.closest<HTMLElement>('[data-keep-split]')?.dataset.keepSplit;
+        charRevealEl.closest<HTMLElement>("[data-keep-split]")?.dataset.keepSplit;
 
-      if (value === 'true') return true;
-      if (value === 'false') return false;
+      if (value === "true") return true;
+      if (value === "false") return false;
 
       return false;
     };
@@ -89,12 +89,12 @@ const init = () => {
      * Checks data-reset-animation on element or closest ancestor with that attribute
      */
     const getResetAnimation = () => {
-      let value =
+      const value =
         charRevealEl.dataset.resetAnimation ||
-        charRevealEl.closest<HTMLElement>('[data-reset-animation]')?.dataset.resetAnimation;
+        charRevealEl.closest<HTMLElement>("[data-reset-animation]")?.dataset.resetAnimation;
 
-      if (value === 'true') return true;
-      if (value === 'false') return false;
+      if (value === "true") return true;
+      if (value === "false") return false;
 
       return false;
     };
@@ -103,27 +103,27 @@ const init = () => {
     const shouldAnimationReset = getResetAnimation();
 
     // Animation properties for initial (hidden) and final (visible) states
-    let initialAnimationProps: GsapTweenVars = {};
-    let finalAnimationProps: GsapTweenVars = {};
+    const initialAnimationProps: GSAPTweenVars = {};
+    const finalAnimationProps: GSAPTweenVars = {};
 
     // Configure animation properties based on animation type
-    if (animationType === 'from-bottom') {
+    if (animationType === "from-bottom") {
       // Start below and animate up
-      initialAnimationProps.y = '100%';
-      finalAnimationProps.y = '0%';
-    } else if (animationType === 'from-top') {
+      initialAnimationProps.y = "100%";
+      finalAnimationProps.y = "0%";
+    } else if (animationType === "from-top") {
       // Start above and animate down
-      initialAnimationProps.y = '-100%';
-      finalAnimationProps.y = '0%';
-    } else if (animationType === 'fade-from-bottom-left') {
+      initialAnimationProps.y = "-100%";
+      finalAnimationProps.y = "0%";
+    } else if (animationType === "fade-from-bottom-left") {
       // Start from bottom-left with fade-in
-      initialAnimationProps.y = fromY || '30%';
-      initialAnimationProps.x = fromX || '-50px';
-      initialAnimationProps.opacity = fromOpacity || '0.05';
+      initialAnimationProps.y = fromY || "30%";
+      initialAnimationProps.x = fromX || "-50px";
+      initialAnimationProps.opacity = fromOpacity || "0.05";
 
-      finalAnimationProps.y = '0%';
-      finalAnimationProps.x = '0%';
-      finalAnimationProps.opacity = '1';
+      finalAnimationProps.y = "0%";
+      finalAnimationProps.x = "0%";
+      finalAnimationProps.opacity = "1";
     }
 
     // Add common animation properties
@@ -133,7 +133,7 @@ const init = () => {
     finalAnimationProps.stagger = staggerDelay;
 
     // References to store created GSAP and SplitText instances
-    let ctx: gsap.Context | undefined = undefined;
+    let ctx: ReturnType<GSAPType["context"]> | undefined = undefined;
     let tl: Timeline | undefined = undefined;
     let splitter: globalThis.SplitText | undefined = undefined;
     let splittedElements: Element[] | undefined = undefined;
@@ -161,10 +161,10 @@ const init = () => {
         tl = gsap.timeline({ paused: true });
 
         // Set initial state (hidden)
-        tl.set(splittedElements!, initialAnimationProps).add('start');
+        tl.set(splittedElements!, initialAnimationProps).add("start");
 
         // Animate to final state (visible)
-        tl.to(splittedElements!, finalAnimationProps).add('end');
+        tl.to(splittedElements!, finalAnimationProps).add("end");
 
         // Set tiny progress to ensure initial state is applied
         tl.progress(0.001);
@@ -179,7 +179,7 @@ const init = () => {
       splitter?.revert();
 
       // Fix layout shift for line animations
-      if (revealType === 'lines' && !keepSplit) {
+      if (revealType === "lines" && !keepSplit) {
         fixLineLayoutShiftAfterRevert();
       }
     };
@@ -193,7 +193,7 @@ const init = () => {
     const fixLineLayoutShiftBeforeSplit = () => {
       // Get exact width with decimal precision
       const rect = charRevealEl.getBoundingClientRect();
-      const charRevealElWidth = rect.width + 'px';
+      const charRevealElWidth = rect.width + "px";
 
       charRevealEl.style.minWidth = charRevealElWidth;
     };
@@ -202,7 +202,7 @@ const init = () => {
      * Remove fixed width after animation reverts
      */
     const fixLineLayoutShiftAfterRevert = () => {
-      charRevealEl.style.removeProperty('min-width');
+      charRevealEl.style.removeProperty("min-width");
     };
 
     /**
@@ -210,32 +210,29 @@ const init = () => {
      */
     const getSplitter = () => {
       // Fix layout issues for line animations
-      if (revealType === 'lines' && !keepSplit) {
+      if (revealType === "lines" && !keepSplit) {
         wrapHyphenatedWords(charRevealEl);
         fixLineLayoutShiftBeforeSplit();
       }
 
       const splitter = SplitText.create(charRevealEl, {
         // For char animations, we need to split into words first, then chars
-        type: revealType === 'chars' ? 'words, chars' : revealType,
+        type: revealType === "chars" ? "words, chars" : revealType,
         // To make lines responsive
-        autoSplit: revealType === 'lines',
-
+        autoSplit: revealType === "lines",
         // Only use masks for from-top/from-bottom animations (not for fade animations)
         mask:
-          animationType === 'fade-from-bottom-left'
+          animationType === "fade-from-bottom-left"
             ? undefined
-            : revealType === 'chars'
-              ? 'words'
+            : revealType === "chars"
+              ? "words"
               : revealType,
         // To make sure chars wont break
-        smartWrap: revealType === 'chars',
-
+        smartWrap: revealType === "chars",
         // CSS classes for split elements
-        charsClass: 'split-chars',
-        wordsClass: 'split-words',
-        linesClass: 'split-lines',
-
+        charsClass: "split-chars",
+        wordsClass: "split-words",
+        linesClass: "split-lines",
         // Initialize timeline when on split
         onSplit: (split) => {
           splittedElements = split[revealType];
@@ -245,7 +242,7 @@ const init = () => {
 
       // Mark element as initialized so CSS can show it
       // Works with CSS: [data-reveal-type]:not([data-initialized]) { visibility: hidden; }
-      charRevealEl.dataset.initialized = '';
+      charRevealEl.setAttribute("data-initialized", "");
       return splitter;
     };
 
@@ -318,7 +315,7 @@ const init = () => {
     // Initialize based on whether page has a loader
     if (doesLoaderExist) {
       // If page has loader, wait for both loader and fonts before initializing
-      window.addEventListener('load', async () => {
+      window.addEventListener("load", async () => {
         const fontsReadyPromise = document.fonts.ready;
         const loaderPromise = wait(loaderDuration);
         await Promise.all([fontsReadyPromise, loaderPromise]);
@@ -333,5 +330,6 @@ const init = () => {
   }
 };
 
-// Start the module
-init();
+afterWebflowReady(() => {
+  initTextReveal();
+});

@@ -7,7 +7,7 @@ export function wrapHyphenatedWords(element: HTMLElement): HTMLElement {
   const textNodes = getTextNodesWithHyphens(element);
 
   textNodes.forEach((textNode) => {
-    const text = textNode.nodeValue || '';
+    const text = textNode.nodeValue || "";
 
     // Create a document fragment to hold the modified content
     const fragment = document.createDocumentFragment();
@@ -17,9 +17,9 @@ export function wrapHyphenatedWords(element: HTMLElement): HTMLElement {
 
     for (const part of parts) {
       // Check if the part contains a hyphen and is not just whitespace
-      if (part.includes('-') && /\S/.test(part)) {
-        const span = document.createElement('span');
-        span.classList.add('split-word-nowrap');
+      if (part.includes("-") && /\S/.test(part)) {
+        const span = document.createElement("span");
+        span.classList.add("split-word-nowrap");
         span.textContent = part;
         fragment.appendChild(span);
       } else {
@@ -51,7 +51,7 @@ function getTextNodesWithHyphens(element: Node): Text[] {
   while ((node = walker.nextNode())) {
     const textNode = node as Text;
     // Only include text nodes that contain hyphens
-    if (textNode.nodeValue && textNode.nodeValue.includes('-')) {
+    if (textNode.nodeValue && textNode.nodeValue.includes("-")) {
       result.push(textNode);
     }
   }

@@ -1,8 +1,6 @@
 {
-  "name": "mka-real-estate-webflow",
-  "version": "0.0.0",
-  "description": "Custom codes for MKA Real Estate Webflow webpages.",
-  "homepage": "https://github.com/finsweet/developer-starter#readme",
+  "name": "zarifs-text-reveal",
+  "description": "Contains text split animations.",
   "license": "ISC",
   "keywords": [],
   "type": "module",
@@ -14,42 +12,40 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./bin/build.js",
     "build": "cross-env NODE_ENV=production node ./bin/build.js",
-    "lint": "eslint --ignore-path .gitignore ./src && prettier --check ./src",
-    "lint:fix": "eslint --ignore-path .gitignore ./src --fix",
+    "lint": "eslint ./src && prettier --check ./src",
+    "lint:fix": "eslint ./src --fix",
     "check": "tsc --noEmit",
     "format": "prettier --write ./src",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "release": "changeset publish",
-    "update": "pnpm update -i -L -r"
+    "release": "release-it --only-version",
+    "update": "pnpm update -i -L -r",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@changesets/changelog-git": "^0.2.0",
-    "@changesets/cli": "^2.27.1",
-    "@finsweet/eslint-config": "^2.0.7",
-    "@finsweet/tsconfig": "^1.3.4",
-    "@playwright/test": "^1.42.1",
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
+    "@eslint/js": "^9.19.0",
+    "@finsweet/eslint-config": "^3.0.3",
+    "@finsweet/tsconfig": "^1.4.2",
+    "@playwright/test": "^1.50.1",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.20.1",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-simple-import-sort": "^12.0.0",
-    "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "csstype": "^3.1.3",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.4.2",
+    "release-it": "^19.0.3",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0"
   },
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
-    "@types/animejs": "^3.1.12",
-    "@zag-js/remove-scroll": "^0.65.1",
-    "animejs": "^3.2.2",
-    "gsap": "3.13.0",
-    "lenis": "^1.1.3",
-    "split-type": "^0.3.4"
+    "@taj-wf/utils": "^1.1.4"
   },
   "engines": {
-    "pnpm": ">=9"
-  }
+    "pnpm": ">=10"
+  },
+  "version": "1.0.0"
 }
