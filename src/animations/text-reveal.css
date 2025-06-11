@@ -31,3 +31,13 @@
   overflow-y: clip !important;
   overflow-x: visible !important;
 }
+
+/*
+Fixes IPhone Safari Issue::after
+the default display:inline-block takes extra height in safari for some reason,
+but inline-flex does not.
+*/
+.split-mask-words-mask {
+  display: inline-flex !important;
+  flex-wrap: wrap;
+}
