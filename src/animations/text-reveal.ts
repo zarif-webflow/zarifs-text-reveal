@@ -15,6 +15,10 @@ import { wrapHyphenatedWords } from "@/utils/wrap-words";
  * with different entrance animations when they enter the viewport.
  */
 
+// Barba Js Page Transitioner Instance
+// @ts-expect-error barbe no types
+const barbaInstance = window.BarbaInstance;
+
 // Select all elements with a data-reveal-type attribute (chars, words, or lines)
 const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
 
@@ -313,7 +317,13 @@ const initTextReveal = () => {
     };
 
     // Initialize based on whether page has a loader
-    if (doesLoaderExist) {
+    if (barbaInstance) {
+      barbaInstance.hooks.afterOnce(() => {
+        document.fonts.ready.then(() => {
+          initSplitSetup();
+        });
+      });
+    } else if (doesLoaderExist) {
       // If page has loader, wait for both loader and fonts before initializing
       window.addEventListener("load", async () => {
         const fontsReadyPromise = document.fonts.ready;
