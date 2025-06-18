@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/animations/line-scroll.css"],
+  "sourcesContent": ["[line-scroll-animation] .line-scroll-splitted-line {\r\n  --line-width: 100%;\r\n  --inactive-color: var(--_theme---scroll-heading-mask--inactive-color);\r\n  --active-color: var(--_theme---scroll-heading-mask--active-color);\r\n\r\n  color: transparent;\r\n  position: relative;\r\n  background-color: var(--inactive-color);\r\n  background-image: linear-gradient(\r\n    90deg,\r\n    var(--active-color),\r\n    var(--active-color) var(--line-width),\r\n    transparent var(--line-width)\r\n  );\r\n  background-clip: text;\r\n}\r\n"],
+  "mappings": ";AAAA,CAAC,uBAAuB,CAAC;AACvB,gBAAc;AACd,oBAAkB,IAAI;AACtB,kBAAgB,IAAI;AAEpB,SAAO;AACP,YAAU;AACV,oBAAkB,IAAI;AACtB;AAAA,IAAkB;AAAA,MAChB,KAAK;AAAA,MACL,IAAI,eAAe;AAAA,MACnB,IAAI,gBAAgB,IAAI,aAAa;AAAA,MACrC,YAAY,IAAI;AAElB,mBAAiB;AACnB;",
+  "names": []
+}

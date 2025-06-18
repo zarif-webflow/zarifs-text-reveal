@@ -37,15 +37,17 @@ const initTextReveal = () => {
   const [gsap, SplitText] = getGsap(["SplitText"]);
 
   if (!gsap) {
-    throw new Error(
+    console.error(
       "GSAP is not imported. GSAP Script must be loaded before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText"
     );
+    return;
   }
 
   if (!SplitText) {
-    throw new Error(
+    console.error(
       "SplitText plugin script is not imported. SplitText Script must be loaded after GSAP script and before text-reveal script. Get it from here: https://gsap.com/docs/v3/Installation/?tab=cdn&module=esm&require=false&plugins=SplitText"
     );
+    return;
   }
 
   // Process each text reveal element
