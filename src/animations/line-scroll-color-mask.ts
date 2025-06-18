@@ -45,6 +45,8 @@ const lineScrollInit = () => {
     return;
   }
 
+  gsap.registerPlugin(SplitText, ScrollTrigger);
+
   const scriptTagElement = getActiveScript();
 
   if (!scriptTagElement) return;
