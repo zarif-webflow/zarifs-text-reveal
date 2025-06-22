@@ -33,6 +33,20 @@ type Timeline = ReturnType<GSAPType["timeline"]>;
  * Initialize text reveal animations
  */
 
+const splitSetupInitializers: Array<
+  () => {
+    splitText: SplitText;
+    revealObserver: IntersectionObserver;
+    resetObserver: IntersectionObserver | undefined;
+  }
+> = [];
+
+const executeSplitSetupInitializers = () => {
+  for (const initializer of splitSetupInitializers) {
+    initializer();
+  }
+};
+
 const initTextReveal = () => {
   const [gsap, SplitText] = getGsap(["SplitText"]);
 
@@ -301,9 +315,11 @@ const initTextReveal = () => {
       );
       revealObserver.observe(charRevealParentEl);
 
+      let resetObserver: IntersectionObserver | undefined = undefined;
+
       // For restart animations, create observer to detect when element leaves viewport
       if (shouldAnimationReset) {
-        const resetObserver = new IntersectionObserver(
+        resetObserver = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
               if (entry.isIntersecting) return;
@@ -316,29 +332,37 @@ const initTextReveal = () => {
         );
         resetObserver.observe(charRevealParentEl);
       }
+
+      return {
+        splitText: splitter,
+        revealObserver,
+        resetObserver,
+      };
     };
 
-    // Initialize based on whether page has a loader
-    if (barbaInstance) {
-      barbaInstance.hooks.afterOnce(() => {
-        document.fonts.ready.then(() => {
-          initSplitSetup();
-        });
-      });
-    } else if (doesLoaderExist) {
-      // If page has loader, wait for both loader and fonts before initializing
-      window.addEventListener("load", async () => {
-        const fontsReadyPromise = document.fonts.ready;
-        const loaderPromise = wait(loaderDuration);
-        await Promise.all([fontsReadyPromise, loaderPromise]);
-        initSplitSetup();
-      });
-    } else {
-      // Otherwise just wait for fonts to be ready
+    splitSetupInitializers.push(initSplitSetup);
+  }
+
+  // Initialize based on whether page has a loader
+  if (barbaInstance) {
+    barbaInstance.hooks.afterOnce(() => {
       document.fonts.ready.then(() => {
-        initSplitSetup();
+        executeSplitSetupInitializers();
       });
-    }
+    });
+  } else if (doesLoaderExist) {
+    // If page has loader, wait for both loader and fonts before initializing
+    window.addEventListener("load", async () => {
+      const fontsReadyPromise = document.fonts.ready;
+      const loaderPromise = wait(loaderDuration);
+      await Promise.all([fontsReadyPromise, loaderPromise]);
+      executeSplitSetupInitializers();
+    });
+  } else {
+    // Otherwise just wait for fonts to be ready
+    document.fonts.ready.then(() => {
+      executeSplitSetupInitializers();
+    });
   }
 };
 
