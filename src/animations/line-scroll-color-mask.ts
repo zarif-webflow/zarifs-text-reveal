@@ -148,9 +148,9 @@ afterWebflowReady(() => {
   lineScrollInit();
 
   // @ts-expect-error no types
-  window.pageLoadFunctions ||= [];
+  window.wfCustomPageLoadFeatures ||= [];
   // @ts-expect-error no types
-  window.pageLoadFunctions.push({
+  window.wfCustomPageLoadFeatures.push({
     name: "LineScrollColorMask",
     init: lineScrollInit,
     destroy: destroyLineScrollInstances,
