@@ -26,6 +26,27 @@ const getActiveScript = () => {
   });
 };
 
+let allSplitAnimationInstances: {
+  splitText: SplitText | undefined;
+  tls: LineAnimationTL[] | undefined;
+}[] = [];
+
+const destroyLineScrollInstances = () => {
+  for (const instance of allSplitAnimationInstances) {
+    if (instance.splitText) {
+      instance.splitText.revert();
+      instance.splitText = undefined;
+    }
+    if (instance.tls) {
+      for (const tlObj of instance.tls) {
+        tlObj.destroy();
+      }
+      instance.tls = undefined;
+    }
+  }
+  allSplitAnimationInstances = [];
+};
+
 const lineScrollInit = () => {
   const lineScrollElements = getMultipleHtmlElements({ selector: `[${PROPERTIES.element}]` });
 
@@ -53,23 +74,26 @@ const lineScrollInit = () => {
 
   const globalInactiveColor = scriptTagElement.getAttribute(PROPERTIES.inactiveColor);
   const globalActiveColor = scriptTagElement.getAttribute(PROPERTIES.activeColor);
-
   const createLineAnimationTL = (lineElement: HTMLElement): LineAnimationTL => {
     let tl: ReturnType<GSAPType["timeline"]> | undefined = undefined;
+    let scrollTrigger: ScrollTrigger | undefined = undefined;
     let ctx: ReturnType<GSAPType["context"]> | undefined = gsap.context(() => {
-      tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: lineElement,
-          start: "top 60%",
-          end: "bottom 60%",
-          scrub: 1,
-        },
-      });
+      tl = gsap.timeline();
       tl.from(lineElement, { "--line-width": 0, duration: 1 });
+
+      scrollTrigger = ScrollTrigger.create({
+        trigger: lineElement,
+        start: "top 60%",
+        end: "bottom 60%",
+        scrub: 1,
+        animation: tl,
+      });
     });
     return {
       tl: tl!,
       destroy: () => {
+        scrollTrigger?.kill();
+        scrollTrigger = undefined;
         tl?.revert();
         tl = undefined;
         ctx?.revert();
@@ -87,7 +111,7 @@ const lineScrollInit = () => {
     const activeColor = lineScrollElement.getAttribute(PROPERTIES.activeColor) || globalActiveColor;
 
     const initSplitAnimation = () => {
-      SplitText.create(lineScrollElement, {
+      return SplitText.create(lineScrollElement, {
         type: "lines",
         autoSplit: true,
         linesClass: "line-scroll-splitted-line",
@@ -114,10 +138,31 @@ const lineScrollInit = () => {
       });
     };
 
-    initSplitAnimation();
+    const splitText = initSplitAnimation();
+
+    allSplitAnimationInstances.push({ splitText, tls: animationTlArr });
   }
 };
 
 afterWebflowReady(() => {
   lineScrollInit();
+
+  // @ts-expect-error no types
+  window.pageLoadFunctions ||= [];
+  // @ts-expect-error no types
+  window.pageLoadFunctions.push({
+    name: "LineScrollColorMask",
+    init: lineScrollInit,
+    destroy: destroyLineScrollInstances,
+    reInit: () => {
+      destroyLineScrollInstances();
+      lineScrollInit();
+    },
+    isInitialized: true,
+    getData: () => {
+      return {
+        allSplitAnimationInstances,
+      };
+    },
+  });
 });
