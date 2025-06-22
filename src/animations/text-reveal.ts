@@ -15,17 +15,6 @@ import { wrapHyphenatedWords } from "@/utils/wrap-words";
  * with different entrance animations when they enter the viewport.
  */
 
-// Barba Js Page Transitioner Instance
-// @ts-expect-error barbe no types
-const barbaInstance = window.BarbaInstance;
-
-// Select all elements with a data-reveal-type attribute (chars, words, or lines)
-const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
-
-// Check if page has a loader by parsing loader duration from body attribute
-const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? "");
-const doesLoaderExist = !Number.isNaN(loaderDuration);
-
 // Type alias for GSAP timeline
 type Timeline = ReturnType<GSAPType["timeline"]>;
 
@@ -33,21 +22,40 @@ type Timeline = ReturnType<GSAPType["timeline"]>;
  * Initialize text reveal animations
  */
 
-const splitSetupInitializers: Array<
-  () => {
-    splitText: SplitText;
-    revealObserver: IntersectionObserver;
-    resetObserver: IntersectionObserver | undefined;
-  }
-> = [];
+type TextRevealInstance = {
+  splitText: SplitText;
+  revealObserver: IntersectionObserver;
+  resetObserver: IntersectionObserver | undefined;
+};
+
+type Nullish<T> = {
+  [K in keyof T]: T[K] | undefined;
+};
+
+let textRevealInstances: Array<Nullish<TextRevealInstance>> = [];
+
+let splitSetupInitializers: Array<() => TextRevealInstance> = [];
 
 const executeSplitSetupInitializers = () => {
   for (const initializer of splitSetupInitializers) {
-    initializer();
+    const { splitText, revealObserver, resetObserver } = initializer();
+    textRevealInstances.push({ splitText, revealObserver, resetObserver });
   }
+  splitSetupInitializers = [];
 };
 
 const initTextReveal = () => {
+  // Barba Js Page Transitioner Instance
+  // @ts-expect-error barbe no types
+  const barbaInstance = window.BarbaInstance;
+
+  // Select all elements with a data-reveal-type attribute (chars, words, or lines)
+  const charRevealElements = document.querySelectorAll<HTMLElement>(selectors.revealType);
+
+  // Check if page has a loader by parsing loader duration from body attribute
+  const loaderDuration = Number.parseInt(document.body.dataset.loaderDuration ?? "");
+  const doesLoaderExist = !Number.isNaN(loaderDuration);
+
   const [gsap, SplitText] = getGsap(["SplitText"]);
 
   if (!gsap) {
@@ -366,6 +374,43 @@ const initTextReveal = () => {
   }
 };
 
+const destroyTextReveal = () => {
+  for (const instance of textRevealInstances) {
+    if (instance.splitText) {
+      instance.splitText.revert();
+      instance.splitText = undefined;
+    }
+    if (instance.revealObserver) {
+      instance.revealObserver.disconnect();
+      instance.revealObserver = undefined;
+    }
+    if (instance.resetObserver) {
+      instance.resetObserver.disconnect();
+      instance.resetObserver = undefined;
+    }
+  }
+  textRevealInstances = [];
+};
+
 afterWebflowReady(() => {
   initTextReveal();
+
+  // @ts-expect-error no types
+  window.wfCustomPageLoadFeatures ||= [];
+  // @ts-expect-error no types
+  window.wfCustomPageLoadFeatures.push({
+    name: "TextRevealAnimations",
+    init: initTextReveal,
+    destroy: destroyTextReveal,
+    reInit: () => {
+      destroyTextReveal();
+      initTextReveal();
+    },
+    isInitialized: true,
+    getData: () => {
+      return {
+        textRevealInstances,
+      };
+    },
+  });
 });
