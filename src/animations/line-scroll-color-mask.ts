@@ -1,6 +1,7 @@
 import "./line-scroll-color-mask.css";
 
 import {
+  addWFCustomPageLoadFeature,
   afterWebflowReady,
   getGsap,
   getHtmlElement,
@@ -147,22 +148,14 @@ const lineScrollInit = () => {
 afterWebflowReady(() => {
   lineScrollInit();
 
-  // @ts-expect-error no types
-  window.wfCustomPageLoadFeatures ||= [];
-  // @ts-expect-error no types
-  window.wfCustomPageLoadFeatures.push({
-    name: "LineScrollColorMask",
+  addWFCustomPageLoadFeature({
+    name: "LINE_SCROLL_COLOR_MASK_ANIMATION",
+    async: false,
     init: lineScrollInit,
     destroy: destroyLineScrollInstances,
     reInit: () => {
       destroyLineScrollInstances();
       lineScrollInit();
-    },
-    isInitialized: true,
-    getData: () => {
-      return {
-        allSplitAnimationInstances,
-      };
     },
   });
 });

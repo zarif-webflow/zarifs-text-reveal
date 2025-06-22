@@ -1,7 +1,13 @@
 import "./text-reveal.css";
 
 import { wait } from "@finsweet/ts-utils";
-import { afterWebflowReady, getGsap, type GSAPTweenVars, type GSAPType } from "@taj-wf/utils";
+import {
+  addWFCustomPageLoadFeature,
+  afterWebflowReady,
+  getGsap,
+  type GSAPTweenVars,
+  type GSAPType,
+} from "@taj-wf/utils";
 
 import { selectors } from "@/utils/constants";
 import { getAnimationValues } from "@/utils/valueGetters";
@@ -395,22 +401,14 @@ const destroyTextReveal = () => {
 afterWebflowReady(() => {
   initTextReveal();
 
-  // @ts-expect-error no types
-  window.wfCustomPageLoadFeatures ||= [];
-  // @ts-expect-error no types
-  window.wfCustomPageLoadFeatures.push({
-    name: "TextRevealAnimations",
+  addWFCustomPageLoadFeature({
+    name: "TEXT_REVEAL_ANIMATION",
+    async: false,
     init: initTextReveal,
     destroy: destroyTextReveal,
     reInit: () => {
       destroyTextReveal();
       initTextReveal();
-    },
-    isInitialized: true,
-    getData: () => {
-      return {
-        textRevealInstances,
-      };
     },
   });
 });

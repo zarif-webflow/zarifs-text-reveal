@@ -1,7 +1,7 @@
 // bin/live-reload.js
-new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
+new EventSource(`${"http://localhost:3002"}/esbuild`).addEventListener("change", () => location.reload());
 
-// node_modules/.pnpm/@taj-wf+utils@1.1.4/node_modules/@taj-wf/utils/dist/index.js
+// node_modules/.pnpm/@taj-wf+utils@1.2.0/node_modules/@taj-wf/utils/dist/index.js
 var afterWebflowReady = (callback) => {
   window.Webflow ||= [];
   window.Webflow.push(callback);
@@ -80,11 +80,17 @@ var getGsap = (plugins = [], log) => {
   }
   return result;
 };
+window.wfCustomPageLoadFeatures ||= [];
+var addWFCustomPageLoadFeature = (feature) => {
+  window.wfCustomPageLoadFeatures ||= [];
+  window.wfCustomPageLoadFeatures.push(feature);
+};
 
 export {
   afterWebflowReady,
   getHtmlElement,
   getMultipleHtmlElements,
-  getGsap
+  getGsap,
+  addWFCustomPageLoadFeature
 };
-//# sourceMappingURL=chunk-7VYLT64Y.js.map
+//# sourceMappingURL=chunk-HPWM7Q7G.js.map
