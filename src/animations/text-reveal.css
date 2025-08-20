@@ -1,8 +1,10 @@
 /* Hide elements that need animation until they are initialized
-   This prevents a flash of unstyled content (FOUC) during page load
-   Elements will become visible once JavaScript completes the SplitText setup */
+   Using opacity instead of visibility to avoid LCP impact
+   This allows the content to be rendered and measured by lighthouse
+   but keeps it visually hidden until animation is ready */
 [data-reveal-type]:not([data-initialized]) {
-  visibility: hidden;
+  opacity: 0;
+  transition: none; /* Prevent any CSS transitions from interfering */
 }
 
 /* Disable font kerning for character-based animations

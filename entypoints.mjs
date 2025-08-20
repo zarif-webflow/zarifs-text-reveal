@@ -4,5 +4,6 @@
  */
 export const ENTRY_POINTS = [
   "src/animations/text-reveal.ts",
+  "src/animations/text-reveal-new.ts",
   "src/animations/line-scroll-color-mask.ts",
 ];
