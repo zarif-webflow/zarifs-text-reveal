@@ -54,9 +54,6 @@ const executeSplitSetupInitializers = () => {
 };
 
 const initTextReveal = () => {
-  // Add script-loaded class to body to enable CSS hiding
-  document.body.classList.add("text-reveal-script-loaded");
-
   // Barba Js Page Transitioner Instance
   // @ts-expect-error barbe no types
   const barbaInstance = window.BarbaInstance;
