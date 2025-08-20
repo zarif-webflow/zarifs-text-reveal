@@ -2,10 +2,9 @@
    Using opacity instead of visibility to avoid LCP impact
    This allows the content to be rendered and measured by lighthouse
    but keeps it visually hidden until animation is ready */
-[data-reveal-type]:not([data-initialized]) {
-  opacity: 0;
-  transition: none; /* Prevent any CSS transitions from interfering */
-}
+/* [data-reveal-type]:not([data-initialized]) {
+  visibility: hidden;
+} */
 
 /* Disable font kerning for character-based animations
    This ensures each character maintains consistent spacing
